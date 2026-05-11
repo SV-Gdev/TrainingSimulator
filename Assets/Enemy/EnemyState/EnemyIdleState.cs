@@ -4,35 +4,38 @@ public class EnemyIdleState : EnemyBaseState
 {
     float timer;
     float idleDuration;
+    float chaseCooldown = 1f; // must be idle for this long before chase can trigger
+    float chaseCooldownTimer;
 
     public EnemyIdleState(EnemyStateMachine owner) : base(owner) { }
 
     public override void Enter(float context)
     {
         timer = 0f;
+        chaseCooldownTimer = 0f;
         idleDuration = context > 0f ? context : owner.idleAfterPatrol;
 
         owner.agent.ResetPath();
-        owner.agent.velocity = Vector3.zero; // Force physical stop
+        owner.agent.velocity = Vector3.zero;
         owner.agent.isStopped = true;
 
-        // Use CrossFade for a smooth 0.2s transition using the Hash
-        // This is much more reliable than Play("String")
-        owner.animator.CrossFade(EnemyStateMachine.HashIdle, 0.2f);
-
-        Debug.Log($"[Idle] Enter: Animation should now be blending to Idle.");
+        owner.animator.Play("Idle", 0, 0f);
     }
 
     public override void Update()
     {
-        if (owner.PlayerInRange(owner.chaseRange))
+        timer += Time.deltaTime;
+        chaseCooldownTimer += Time.deltaTime;
+
+       
+        if (chaseCooldownTimer >= chaseCooldown &&
+            owner.PlayerInRange(owner.chaseRange))
         {
             owner.agent.isStopped = false;
             owner.SwitchState(owner.ChaseState);
             return;
         }
 
-        timer += Time.deltaTime;
         if (timer >= idleDuration)
         {
             owner.agent.isStopped = false;

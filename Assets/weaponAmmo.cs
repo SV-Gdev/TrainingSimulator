@@ -1,56 +1,63 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class weaponAmmo : MonoBehaviour
 {
-    public int clipsize;
-    public int ExtraAmmo;
-    public int currentammo;
+    [Header("Ammo Settings")]
+    public int clipSize = 30;
+    public int extraAmmo = 90;
+    public int currentAmmo;
 
-    public TextMeshProUGUI ammodisplay;
+    [Header("UI")]
+    public TextMeshProUGUI ammoDisplay;
 
     void Start()
     {
-        if (ammodisplay == null)
-            ammodisplay = FindObjectOfType<TextMeshProUGUI>();
-
-        currentammo = clipsize;
+        currentAmmo = clipSize;
         UpdateAmmoUI();
     }
 
     void UpdateAmmoUI()
     {
-        if (ammodisplay == null)
+        if (ammoDisplay == null)
         {
-            Debug.LogError("Ammo UI not assigned on: " + gameObject.name);
+            Debug.LogError($"[weaponAmmo] ammoDisplay not assigned on {gameObject.name}");
             return;
         }
-
-        ammodisplay.text = currentammo + " / " + ExtraAmmo;
+        ammoDisplay.text = $"{currentAmmo} / {extraAmmo}";
     }
 
     public void UseAmmo(int amount)
     {
-        currentammo -= amount;
-        if (currentammo < 0) currentammo = 0;
-
+        if (currentAmmo <= 0) return;
+        currentAmmo -= amount;
+        currentAmmo = Mathf.Clamp(currentAmmo, 0, clipSize);
         UpdateAmmoUI();
     }
 
+    public bool CanShoot() => currentAmmo > 0;
+
     public void Reload()
     {
-        Debug.Log("Reloading...");
+        if (currentAmmo == clipSize || extraAmmo == 0)
+        {
+            Debug.Log("[Ammo] Nothing to reload");
+            return;
+        }
 
-        if (currentammo == clipsize || ExtraAmmo == 0) return;
+        int needed = clipSize - currentAmmo;
+        int toReload = Mathf.Min(needed, extraAmmo);
+        currentAmmo += toReload;
+        extraAmmo -= toReload;
 
-        int ammotoreload = Mathf.Min(clipsize - currentammo, ExtraAmmo);
+        Debug.Log($"[Ammo] Reloaded {toReload} — current={currentAmmo} extra={extraAmmo}");
+        UpdateAmmoUI();
+    }
 
-        currentammo += ammotoreload;
-        ExtraAmmo -= ammotoreload;
-
+    public void AddAmmo(int amount)
+    {
+        extraAmmo += amount;
         UpdateAmmoUI();
     }
 }
