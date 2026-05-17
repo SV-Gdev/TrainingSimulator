@@ -116,14 +116,26 @@ public class PlayerMovement : MonoBehaviour
    // }
 
     void MovePlayer()
+{
+    // 1. Calculate direction based on player orientation
+    direction = transform.right * moveInput.x + transform.forward * moveInput.y;
+    direction.Normalize();
+
+    // 2. Apply movement as a continuous force
+    // (We multiply by a factor like 10f just to make the acceleration snappy)
+    float forceMultiplier = 6f;
+    rb.AddForce(direction * moveSpeed * forceMultiplier, ForceMode.Force);
+
+    // 3. Prevent the player from accelerating infinitely 
+    // We separate horizontal velocity from vertical (falling/jumping) velocity
+    Vector3 horizontalVelocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+    
+    if (horizontalVelocity.magnitude > moveSpeed)
     {
-        
-        direction = transform.right * moveInput.x + transform.forward * moveInput.y;
-        direction.Normalize();
-
-        rb.velocity = new Vector3(direction.x * moveSpeed, rb.velocity.y, direction.z * moveSpeed);
+        Vector3 cappedVelocity = horizontalVelocity.normalized * moveSpeed;
+        rb.velocity = new Vector3(cappedVelocity.x, rb.velocity.y, cappedVelocity.z);
     }
-
+}
     void OnJump()
     {
         if (isGrounded)
