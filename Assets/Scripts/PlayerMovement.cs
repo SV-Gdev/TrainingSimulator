@@ -109,11 +109,11 @@ public class PlayerMovement : MonoBehaviour
         moveInput = value.Get<Vector2>();
     }
 
-   
-   // void OnLook(InputValue value)
-   // {
-   //   //  lookInput = value.Get<Vector2>();
-   // }
+
+    // void OnLook(InputValue value)
+    // {
+    //   //  lookInput = value.Get<Vector2>();
+    // }
 
     void MovePlayer()
 {

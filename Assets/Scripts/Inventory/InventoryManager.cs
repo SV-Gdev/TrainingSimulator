@@ -127,7 +127,10 @@ public class InventoryManager : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         {
             GameObject newItem = Instantiate(itemPrefab,inventoryParent.transform);
             newItem.GetComponent<InventoryItem>().Initialize  (Pickeditem.GetComponent<ItemPickable>().itemScriptableObject);
-            
+
+            WeaponSwap swapper = FindObjectOfType<WeaponSwap>();
+            swapper.AddWeaponToInventory(Pickeditem.GetComponent<ItemPickable>().itemScriptableObject.prefab);
+
             emptySlot.GetComponent<InventorySlot>().SetHeldItem(newItem);
             Destroy(Pickeditem);
         }

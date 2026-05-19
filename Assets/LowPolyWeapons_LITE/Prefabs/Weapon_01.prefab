@@ -115,7 +115,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5738456080911321149}
-  - component: {fileID: 4060494691376866161}
   - component: {fileID: 7788018155844040887}
   m_Layer: 0
   m_Name: Weapon_01
@@ -143,24 +142,6 @@ Transform:
   - {fileID: 8116155075977294907}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4060494691376866161
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4965438261709640327}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 486f4bb1a58e9a542ab94c75565db6f6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  weaponData: {fileID: 11400000, guid: 847f928ea4c73b840b38b12775955bba, type: 2}
-  SemiAuto: 0
-  bullet: {fileID: 0}
-  BarrelPos: {fileID: 0}
-  damage: 20
-  GunShot: {fileID: 8300000, guid: 380a61624a607f042ab5e96218f37633, type: 3}
 --- !u!114 &7788018155844040887
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -173,10 +154,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46fd96a40ffa3fa4c94bca42b4617eb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  clipsize: 0
-  ExtraAmmo: 0
-  currentammo: 0
-  ammodisplay: {fileID: 0}
+  clipSize: 30
+  extraAmmo: 90
+  currentAmmo: 0
+  ammoDisplay: {fileID: 0}
 --- !u!1 &6650470630134122455
 GameObject:
   m_ObjectHideFlags: 0
