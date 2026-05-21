@@ -8,17 +8,16 @@ public class WeaponSwap : MonoBehaviour
     private int currentWeaponIndex = 0;
 
     [SerializeField] Animator anim; // Drag your player's Animator here
-    [SerializeField] private Transform weaponHolder;
+    [SerializeField] private Transform weaponHolder; // Your hand bone slot
 
     void Start()
     {
-        // Start fresh and ensure animations match our empty hands
         UpdateWeapon();
     }
 
     void Update()
     {
-        if (equippedWeapons.Count <= 1) return; // No need to swap if 0 or 1 weapon
+        if (equippedWeapons.Count <= 1) return;
 
         float scroll = Input.GetAxis("Mouse ScrollWheel");
 
@@ -39,13 +38,12 @@ public class WeaponSwap : MonoBehaviour
     {
         if (anim == null) return;
 
-        // 1. SAFETY CHECK: Remove any null or destroyed weapons from the list automatically
+        // Clean out any destroyed weapons
         equippedWeapons.RemoveAll(item => item == null);
 
-        // 2. Check if we actually have any valid weapons left
         bool hasWeapons = equippedWeapons.Count > 0;
 
-        // 3. Safely loop through and activate only the current weapon index
+        // Loop through and activate the selected weapon index
         for (int i = 0; i < equippedWeapons.Count; i++)
         {
             if (equippedWeapons[i] != null)
@@ -54,30 +52,58 @@ public class WeaponSwap : MonoBehaviour
             }
         }
 
-        // 4. Update Animator Layers
-        // If hasWeapons is false, targetWeight becomes 0f, turning off the rifle layer!
+        // Update Animator Layers
         float targetWeight = hasWeapons ? 1f : 0f;
         anim.SetLayerWeight(1, targetWeight);
         anim.SetBool("IsArmed", hasWeapons);
+
+        // =======================================================================
+        // FIXED STATE CONTROLLER WIRING:
+        // Uses your exact variables to cleanly handle armed vs unarmed states.
+        // =======================================================================
+        ActionState actionState = GetComponent<ActionState>();
+
+        if (hasWeapons)
+        {
+            // Get the WeaponManager script component from the active weapon clone
+            WeaponManager activeWeapon = equippedWeapons[currentWeaponIndex].GetComponent<WeaponManager>();
+
+            // If both are found, link them together!
+            if (actionState != null && activeWeapon != null)
+            {
+                actionState.SetWeapon(activeWeapon);
+            }
+        }
+        else
+        {
+            // If the inventory list is completely empty, clean up the UI and states safely
+            if (actionState != null)
+            {
+                actionState.SetWeapon(null); // Clears tracking references inside ActionState
+            }
+
+            // Find the white UI element container box and shut it down safely
+            GameObject ammoBox = GameObject.Find("AmmoDisplay");
+            if (ammoBox != null)
+            {
+                ammoBox.SetActive(false);
+            }
+        }
+        // =======================================================================
     }
 
     public void AddWeaponToInventory(GameObject weaponPrefab)
     {
-        // Pass 'false' as the 3rd argument to tell Unity: 
-        // "Do NOT keep world position, snap directly to the parent's origin!"
+        // Spawns weapon safely inside your weaponHolder hand bone slot
         GameObject newWeapon = Instantiate(weaponPrefab, weaponHolder, false);
 
-        // Hard-reset everything to clear out any remaining prefab offsets
         newWeapon.transform.localPosition = Vector3.zero;
         newWeapon.transform.localRotation = Quaternion.identity;
         newWeapon.transform.localScale = Vector3.one;
 
-        // Turn off physics so it doesn't drop to the floor
+        // Turn off physics components on the clone
         Collider[] weaponColliders = newWeapon.GetComponentsInChildren<Collider>();
-        foreach (Collider col in weaponColliders)
-        {
-            col.enabled = false;
-        }
+        foreach (Collider col in weaponColliders) col.enabled = false;
 
         Rigidbody weaponRb = newWeapon.GetComponent<Rigidbody>();
         if (weaponRb != null)

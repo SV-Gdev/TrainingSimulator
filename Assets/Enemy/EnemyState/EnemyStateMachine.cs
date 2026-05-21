@@ -98,6 +98,14 @@ public class EnemyStateMachine : MonoBehaviour
         else if (chase)
             animator.Play("Chase", 0, 0f);
     }
+    public void AlertAndChasePlayer()
+    {
+        // If the enemy is already attacking or chasing, don't interrupt the cycle
+        if (currentState == ChaseState || currentState == AttackState) return;
+
+        Debug.Log($"[StateMachine] {name} was hit! Forcing ChaseState.");
+        SwitchState(ChaseState);
+    }
     public Transform GetRandomWaypoint(Transform last)
     {
         if (waypointTransforms.Length == 0) return null;

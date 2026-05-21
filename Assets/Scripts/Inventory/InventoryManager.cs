@@ -94,7 +94,7 @@ public class InventoryManager : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 else
                     spawnPosition = cam.transform.position + cam.transform.forward * 2f;
 
-                GameObject newItem = Instantiate(itemData.prefab, spawnPosition, Quaternion.identity);
+                GameObject newItem = Instantiate(itemData.equippedWeaponPrefab, spawnPosition, Quaternion.identity);
                 newItem.GetComponent<ItemPickable>().itemScriptableObject = itemData;
 
                 lastItemSlot.GetComponent<InventorySlot>().HeldItem = null;
@@ -129,7 +129,7 @@ public class InventoryManager : MonoBehaviour, IPointerDownHandler, IPointerUpHa
             newItem.GetComponent<InventoryItem>().Initialize  (Pickeditem.GetComponent<ItemPickable>().itemScriptableObject);
 
             WeaponSwap swapper = FindObjectOfType<WeaponSwap>();
-            swapper.AddWeaponToInventory(Pickeditem.GetComponent<ItemPickable>().itemScriptableObject.prefab);
+            swapper.AddWeaponToInventory(Pickeditem.GetComponent<ItemPickable>().itemScriptableObject.equippedWeaponPrefab);
 
             emptySlot.GetComponent<InventorySlot>().SetHeldItem(newItem);
             Destroy(Pickeditem);

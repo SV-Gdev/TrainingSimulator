@@ -433,11 +433,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3984054576387728955}
-  - component: {fileID: 7145019383175566322}
-  - component: {fileID: 107292095905971837}
   - component: {fileID: 2129699942186196176}
   - component: {fileID: 4383148504193896166}
   - component: {fileID: 1880127809924651718}
+  - component: {fileID: -3593031042362979606}
+  - component: {fileID: 2557561328606666985}
   m_Layer: 0
   m_Name: Weapon_01
   m_TagString: Untagged
@@ -462,42 +462,9 @@ Transform:
   - {fileID: 266066936766050018}
   - {fileID: 6766438222434914524}
   - {fileID: 6542722849734984821}
+  - {fileID: 5825366959211411256}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7145019383175566322
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7713250287414291313}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 486f4bb1a58e9a542ab94c75565db6f6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  weaponData: {fileID: 11400000, guid: 847f928ea4c73b840b38b12775955bba, type: 2}
-  SemiAuto: 0
-  bullet: {fileID: 0}
-  BarrelPos: {fileID: 0}
-  damage: 20
-  GunShot: {fileID: 8300000, guid: 380a61624a607f042ab5e96218f37633, type: 3}
---- !u!114 &107292095905971837
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7713250287414291313}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 46fd96a40ffa3fa4c94bca42b4617eb8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  clipsize: 0
-  ExtraAmmo: 0
-  currentammo: 0
-  ammodisplay: {fileID: 0}
 --- !u!54 &2129699942186196176
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -560,3 +527,74 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemScriptableObject: {fileID: 11400000, guid: 5ce9073aa182c6d4f8ea3aa8bc4e19ae,
     type: 2}
+--- !u!114 &-3593031042362979606
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7713250287414291313}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 486f4bb1a58e9a542ab94c75565db6f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponData: {fileID: 11400000, guid: 847f928ea4c73b840b38b12775955bba, type: 2}
+  weaponSwap: {fileID: 0}
+  SemiAuto: 0
+  bullet: {fileID: 4221052141086108791, guid: d5df3b4f99dc09a44a69fb6fc3f5ec0d, type: 3}
+  BarrelPos: {fileID: 5825366959211411256}
+  damage: 20
+  GunShot: {fileID: 8300000, guid: 50238a32333496c46bf4f0eef34ca63c, type: 3}
+  Ammo: {fileID: 0}
+  leftHandTarget: {fileID: 5172525826414709473, guid: 37b113db945d1794cb87685af0f447ee,
+    type: 3}
+  leftHandHint: {fileID: 7984490644469416472, guid: e2e5b2c9cc2c508479b5af77a7cecba2,
+    type: 3}
+--- !u!114 &2557561328606666985
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7713250287414291313}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46fd96a40ffa3fa4c94bca42b4617eb8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  clipSize: 30
+  extraAmmo: 90
+  currentAmmo: 0
+  ammoDisplay: {fileID: 0}
+--- !u!1 &8940343917372528147
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5825366959211411256}
+  m_Layer: 0
+  m_Name: BarrelPos2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5825366959211411256
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8940343917372528147}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.198, y: 0.063, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3984054576387728955}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

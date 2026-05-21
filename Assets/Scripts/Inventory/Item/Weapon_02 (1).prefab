@@ -318,6 +318,37 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -197516777185726477, guid: e00b27b8d9c47264ab84203ddf941b2c, type: 3}
+--- !u!1 &2130219632445372710
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8699900472769396021}
+  m_Layer: 0
+  m_Name: BarrelPos1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8699900472769396021
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2130219632445372710}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.663, y: 0.083, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3076334315888072797}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4237311494436226799
 GameObject:
   m_ObjectHideFlags: 0
@@ -542,6 +573,8 @@ GameObject:
   - component: {fileID: 3133436559608549719}
   - component: {fileID: 2670576745871669034}
   - component: {fileID: 7003143676831151433}
+  - component: {fileID: -5319304236960354867}
+  - component: {fileID: -148325792194715806}
   m_Layer: 0
   m_Name: Weapon_02 (1)
   m_TagString: Untagged
@@ -569,6 +602,7 @@ Transform:
   - {fileID: 564807744733326598}
   - {fileID: 3515317982425958996}
   - {fileID: 531385190847215343}
+  - {fileID: 8699900472769396021}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &3133436559608549719
@@ -633,6 +667,46 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemScriptableObject: {fileID: 11400000, guid: a3f12324d80c898498307b6159e05974,
     type: 2}
+--- !u!114 &-5319304236960354867
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4276591245663286670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 486f4bb1a58e9a542ab94c75565db6f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponData: {fileID: 11400000, guid: 847f928ea4c73b840b38b12775955bba, type: 2}
+  weaponSwap: {fileID: 0}
+  SemiAuto: 0
+  bullet: {fileID: 4221052141086108791, guid: d5df3b4f99dc09a44a69fb6fc3f5ec0d, type: 3}
+  BarrelPos: {fileID: 8699900472769396021}
+  damage: 10
+  GunShot: {fileID: 8300000, guid: 380a61624a607f042ab5e96218f37633, type: 3}
+  Ammo: {fileID: 0}
+  leftHandTarget: {fileID: 5172525826414709473, guid: 37b113db945d1794cb87685af0f447ee,
+    type: 3}
+  leftHandHint: {fileID: 7984490644469416472, guid: e2e5b2c9cc2c508479b5af77a7cecba2,
+    type: 3}
+--- !u!114 &-148325792194715806
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4276591245663286670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46fd96a40ffa3fa4c94bca42b4617eb8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  clipSize: 30
+  extraAmmo: 90
+  currentAmmo: 0
+  ammoDisplay: {fileID: 0}
 --- !u!1 &4866307584842757556
 GameObject:
   m_ObjectHideFlags: 0

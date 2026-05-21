@@ -6,30 +6,43 @@ public class Bullet : MonoBehaviour
 {
     [SerializeField] float TimeToDestroy;
     [HideInInspector] public WeaponManager weapon;
-   
-    // Start is called before the first frame update
+
     void Start()
     {
         Destroy(this.gameObject, TimeToDestroy);
     }
 
-    // Update is called once per frame
-   
-
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.GetComponentInParent<EnemyHealth>())
+        // 1. Check if we hit an Enemy Base Health component
+        EnemyHealth enemyHealth = collision.gameObject.GetComponentInParent<EnemyHealth>();
+        if (enemyHealth != null)
         {
-            EnemyHealth enemyHealth = collision.gameObject.GetComponentInParent<EnemyHealth>();
             enemyHealth.TakeDamage(weapon.damage);
-        }
-        Destroy(this.gameObject);
-        if (collision.gameObject.GetComponentInParent<EnemyArmor1>())
-        {
-            EnemyArmor1 enemyArmor1 = collision.gameObject.GetComponentInParent<EnemyArmor1>();
-            enemyArmor1.TakeDamage(weapon.damage);
-        }
-        Destroy(this.gameObject);
 
+            // ALERT LOGIC: Trigger the enemy state machine to chase
+            EnemyStateMachine stateMachine = collision.gameObject.GetComponentInParent<EnemyStateMachine>();
+            if (stateMachine != null)
+            {
+                stateMachine.AlertAndChasePlayer();
+            }
+        }
+
+        // 2. Check if we hit an armored variant component instead
+        EnemyArmor1 enemyArmor1 = collision.gameObject.GetComponentInParent<EnemyArmor1>();
+        if (enemyArmor1 != null)
+        {
+            enemyArmor1.TakeDamage(weapon.damage);
+
+            // ALERT LOGIC: Trigger the armored enemy state machine to chase
+            EnemyStateMachine stateMachine = collision.gameObject.GetComponentInParent<EnemyStateMachine>();
+            if (stateMachine != null)
+            {
+                stateMachine.AlertAndChasePlayer();
+            }
+        }
+
+        // 3. Destroy bullet object cleanly on impact
+        Destroy(this.gameObject);
     }
 }

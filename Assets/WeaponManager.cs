@@ -35,27 +35,41 @@ public class WeaponManager : MonoBehaviour
 
     private void OnEnable()
     {
-        // 1. Grab all necessary components from the parent (Player) or this weapon
+        // 1. Grab components from the parent player hierarchy cleanly
         if (weaponClass == null) weaponClass = GetComponentInParent<WeaponClassManager>();
-        if (weaponSwap == null) weaponSwap = GetComponentInParent<WeaponSwap>(); // NEW: Grabs WeaponSwap
-
+        if (weaponSwap == null) weaponSwap = GetComponentInParent<WeaponSwap>();
         if (Ammo == null) Ammo = GetComponent<weaponAmmo>();
         if (audioSource == null) audioSource = GetComponent<AudioSource>();
 
-        // 2. Safety Check for WeaponClassManager to prevent the crash you saw earlier!
+        // 2. NEW AUTO-REFS FOR CLONES: Find scene objects that aren't on the prefab
+        if (aim == null)
+        {
+            aim = GetComponentInParent<AimManage>();
+            // If it's still null, look globally on your player character
+            if (aim == null) aim = GameObject.FindAnyObjectByType<AimManage>();
+        }
+
+        // 3. Force weaponAmmo to find the UI text box right now
+        if (Ammo != null && Ammo.ammoDisplay == null)
+        {
+            GameObject displayObj = GameObject.Find("AmmoDisplay");
+            if (displayObj != null)
+            {
+                Ammo.ammoDisplay = displayObj.GetComponent<TMPro.TextMeshProUGUI>();
+            }
+        }
+
+        // 4. Safety Check execution for WeaponClassManager
         if (weaponClass != null)
         {
             weaponClass.SelectCurrentWeapon(this);
         }
-        else
-        {
-            Debug.LogWarning(gameObject.name + ": Cannot find WeaponClassManager on the parent!");
-        }
 
-        // 3. Safety Check for WeaponSwap
-        if (weaponSwap == null)
+        // 5. Force a UI update now that all links are restored!
+        if (Ammo != null)
         {
-            Debug.LogWarning(gameObject.name + ": Cannot find WeaponSwap script on the parent!");
+            // Call the public update directly to push the new numbers to your HUD
+            Ammo.UpdateAmmoUI();
         }
     }
 
@@ -66,10 +80,16 @@ public class WeaponManager : MonoBehaviour
 
     bool ShouldFire()
     {
+        // 1. NEW SAFETY GUARD: If this weapon is NOT active in the world hierarchy, stop immediately!
+        if (!gameObject.activeInHierarchy) return false;
+
+        // 2. NEW INVENTORY GUARD: Double-check with WeaponSwap to make sure we are allowed to shoot
+        if (weaponSwap == null || weaponSwap.equippedWeapons.Count == 0) return false;
+
         fireRateTimer += Time.deltaTime;
 
         if (fireRateTimer < weaponData.firerate) return false;
-        if (Ammo != null && Ammo.currentAmmo == 0) return false; // Added Ammo null check just in case
+        if (Ammo != null && Ammo.currentAmmo == 0) return false;
 
         if (SemiAuto && Input.GetKeyDown(KeyCode.Mouse0)) return true;
         if (!SemiAuto && Input.GetKey(KeyCode.Mouse0)) return true;
