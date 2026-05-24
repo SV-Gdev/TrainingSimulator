@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
-using UnityEditor.Experimental.GraphView;
 
 public class InventoryManager : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
@@ -22,7 +21,6 @@ public class InventoryManager : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
     }
 
-    // Update is called once per frame
     void Update()
     {
         inventoryParent.SetActive(isInventoryOpened);
@@ -36,23 +34,26 @@ public class InventoryManager : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         {
             if (isInventoryOpened)
             {
-                Cursor.lockState = CursorLockMode.Locked;   
+                Cursor.lockState = CursorLockMode.Locked;
                 isInventoryOpened = false;
             }
             else
             {
-                Cursor.lockState &= CursorLockMode.None;
+                Cursor.lockState = CursorLockMode.None; // Fixed compiler bitwise assignment error
                 isInventoryOpened = true;
             }
         }
     }
+
     public void OnPointerDown(PointerEventData eventData)
     {
         if (eventData.button == PointerEventData.InputButton.Left)
         {
             GameObject clickedObject = eventData.pointerCurrentRaycast.gameObject;
+            if (clickedObject == null) return;
+
             InventorySlot slot = clickedObject.GetComponent<InventorySlot>();
-            if (slot != null && slot.HeldItem !=null)
+            if (slot != null && slot.HeldItem != null)
             {
                 draggedObject = slot.HeldItem;
                 slot.HeldItem = null;
@@ -68,7 +69,6 @@ public class InventoryManager : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         {
             GameObject clickedObject = eventData.pointerCurrentRaycast.gameObject;
 
-            // Check parent too in case raycast hits the item icon child instead of slot
             InventorySlot slot = clickedObject.GetComponent<InventorySlot>();
             if (slot == null)
                 slot = clickedObject.GetComponentInParent<InventorySlot>();
@@ -107,33 +107,76 @@ public class InventoryManager : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
             draggedObject = null;
         }
-    
-}
+    }
+
     public void ItemPicked(GameObject Pickeditem)
     {
         GameObject emptySlot = null;
 
         for (int i = 0; i < slots.Length; i++)
         {
+            if (slots[i] == null) continue;
             InventorySlot slot = slots[i].GetComponent<InventorySlot>();
 
-            if(slot.HeldItem == null)
+            if (slot != null && slot.HeldItem == null)
             {
                 emptySlot = slots[i];
                 break;
             }
         }
+
         if (emptySlot != null)
         {
-            GameObject newItem = Instantiate(itemPrefab,inventoryParent.transform);
-            newItem.GetComponent<InventoryItem>().Initialize  (Pickeditem.GetComponent<ItemPickable>().itemScriptableObject);
+            GameObject newItem = Instantiate(itemPrefab, inventoryParent.transform);
+            newItem.GetComponent<InventoryItem>().Initialize(Pickeditem.GetComponent<ItemPickable>().itemScriptableObject);
 
             WeaponSwap swapper = FindObjectOfType<WeaponSwap>();
-            swapper.AddWeaponToInventory(Pickeditem.GetComponent<ItemPickable>().itemScriptableObject.equippedWeaponPrefab);
+            if (swapper != null)
+            {
+                swapper.AddWeaponToInventory(Pickeditem.GetComponent<ItemPickable>().itemScriptableObject.equippedWeaponPrefab);
+            }
 
             emptySlot.GetComponent<InventorySlot>().SetHeldItem(newItem);
             Destroy(Pickeditem);
         }
     }
-}
 
+    // =======================================================================
+    // ADDED METHOD: Syncs and destroys UI items when thrown or discarded!
+    // =======================================================================
+    public void UpdateInventoryUI()
+    {
+        WeaponSwap swapper = FindObjectOfType<WeaponSwap>();
+        if (swapper == null) return;
+
+        // Loop through all UI slot boxes
+        for (int i = 0; i < slots.Length; i++)
+        {
+            if (slots[i] == null) continue;
+            InventorySlot slotScript = slots[i].GetComponent<InventorySlot>();
+            if (slotScript == null || slotScript.HeldItem == null) continue;
+
+            InventoryItem uiItem = slotScript.HeldItem.GetComponent<InventoryItem>();
+            if (uiItem != null && uiItem.ItemScriptableObject != null)
+            {
+                // Check if this specific item type still exists anywhere inside backend array
+                bool stillExistsInBackend = false;
+                foreach (GameObject weapon in swapper.equippedWeapons)
+                {
+                    if (weapon != null && weapon.name.ToLower().Contains(uiItem.ItemScriptableObject.itemName.ToLower()))
+                    {
+                        stillExistsInBackend = true;
+                        break;
+                    }
+                }
+
+                // If the backend weapon asset list doesn't have it anymore, delete its UI box layout!
+                if (!stillExistsInBackend)
+                {
+                    Destroy(slotScript.HeldItem);
+                    slotScript.HeldItem = null;
+                }
+            }
+        }
+    }
+}

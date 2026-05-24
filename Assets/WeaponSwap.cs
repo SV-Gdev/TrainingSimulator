@@ -38,37 +38,44 @@ public class WeaponSwap : MonoBehaviour
     {
         if (anim == null) return;
 
-        // Clean out any destroyed weapons
+        // Clean out dead tracking reference links
         equippedWeapons.RemoveAll(item => item == null);
 
         bool hasWeapons = equippedWeapons.Count > 0;
+        bool holdingGrenade = false;
 
-        // Loop through and activate the selected weapon index
+        // Loop through the weapon array list
         for (int i = 0; i < equippedWeapons.Count; i++)
         {
             if (equippedWeapons[i] != null)
             {
-                equippedWeapons[i].SetActive(i == currentWeaponIndex);
+                bool isCurrent = (i == currentWeaponIndex);
+                equippedWeapons[i].SetActive(isCurrent);
+
+                // DETECT GRENADE: Force lowercase conversion to avoid matching typo bugs
+                if (isCurrent && equippedWeapons[i].name.ToLower().Contains("grenade"))
+                {
+                    holdingGrenade = true;
+                }
             }
         }
 
-        // Update Animator Layers
-        float targetWeight = hasWeapons ? 1f : 0f;
-        anim.SetLayerWeight(1, targetWeight);
-        anim.SetBool("IsArmed", hasWeapons);
+        // Drop the Shooting Layer weight to 0 instantly if holding a grenade
+        int shootingLayerIndex = anim.GetLayerIndex("Shooting");
+        if (shootingLayerIndex != -1)
+        {
+            float targetWeight = (hasWeapons && !holdingGrenade) ? 1f : 0f;
+            anim.SetLayerWeight(shootingLayerIndex, targetWeight);
+        }
 
-        // =======================================================================
-        // FIXED STATE CONTROLLER WIRING:
-        // Uses your exact variables to cleanly handle armed vs unarmed states.
-        // =======================================================================
+        // Set your combat stance tracking parameters safely
+        anim.SetBool("IsArmed", hasWeapons && !holdingGrenade);
+
         ActionState actionState = GetComponent<ActionState>();
 
         if (hasWeapons)
         {
-            // Get the WeaponManager script component from the active weapon clone
             WeaponManager activeWeapon = equippedWeapons[currentWeaponIndex].GetComponent<WeaponManager>();
-
-            // If both are found, link them together!
             if (actionState != null && activeWeapon != null)
             {
                 actionState.SetWeapon(activeWeapon);
@@ -76,20 +83,22 @@ public class WeaponSwap : MonoBehaviour
         }
         else
         {
-            // If the inventory list is completely empty, clean up the UI and states safely
-            if (actionState != null)
-            {
-                actionState.SetWeapon(null); // Clears tracking references inside ActionState
-            }
+            if (actionState != null) actionState.SetWeapon(null);
 
-            // Find the white UI element container box and shut it down safely
             GameObject ammoBox = GameObject.Find("AmmoDisplay");
-            if (ammoBox != null)
-            {
-                ammoBox.SetActive(false);
-            }
+            if (ammoBox != null) ammoBox.SetActive(false);
         }
+
         // =======================================================================
+        // TARGET DIRECT CALL: Refreshes your InventoryManager UI tracking slots!
+        // =======================================================================
+        InventoryManager inventory = GetComponent<InventoryManager>();
+        if (inventory == null) inventory = FindObjectOfType<InventoryManager>();
+
+        if (inventory != null)
+        {
+            inventory.UpdateInventoryUI();
+        }
     }
 
     public void AddWeaponToInventory(GameObject weaponPrefab)
@@ -120,6 +129,14 @@ public class WeaponSwap : MonoBehaviour
             currentWeaponIndex = 0;
         }
 
+        UpdateWeapon();
+    }
+
+    // Call this inside ActionState to seamlessly update inventory after a throw event completes
+    public void ForceWeaponRefreshAfterThrow()
+    {
+        // Reset our slot tracking indicators back down to 0 safely
+        currentWeaponIndex = 0;
         UpdateWeapon();
     }
 }
