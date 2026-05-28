@@ -1,8 +1,16 @@
+using System; // REQUIRED for Action events
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
 public class EnemyArmor1 : MonoBehaviour
 {
+    // =======================================================================
+    // THE OBSERVER PATTERN EVENT (BROADCASTER)
+    // Passes: (int scorePoints) so the ScoreManager knows how much to add
+    // =======================================================================
+    public event Action<int> OnEnemyArmorDeath;
+
     [SerializeField] public float armor;
     [SerializeField] float maxArmor = 50f;
     [SerializeField] float health;
@@ -26,7 +34,7 @@ public class EnemyArmor1 : MonoBehaviour
         {
             Debug.Log("HIT");
             armor -= damage;
-            
+
             if (armor < 0)
             {
                 float remainingDamage = Mathf.Abs(armor);
@@ -38,12 +46,17 @@ public class EnemyArmor1 : MonoBehaviour
         {
             Debug.Log("HIT");
             health -= damage;
-           
         }
+
         if (health <= 0)
         {
             Debug.Log("Death");
-            ScoreManager.Instance.AddScore(scoreValue);
+
+            // =======================================================================
+            // CHANGED TO EVENT BROADCAST: Instead of using .Instance, we fire the event!
+            // =======================================================================
+            OnEnemyArmorDeath?.Invoke(scoreValue);
+
             gameObject.SetActive(false);
             RS1.Instance.StartRespawn(gameObject, spawnPosition, spawnRotation, respawnDelay, maxHealth, maxArmor, this);
         }

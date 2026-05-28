@@ -3,9 +3,9 @@ using UnityEngine;
 public class EnemyChaseState : EnemyBaseState
 {
     float updateTimer;
-    float lostTimer;        
+    float lostTimer;
     const float Interval = 0.2f;
-    const float LostGracePeriod = 1.5f; 
+    const float LostGracePeriod = 1.5f;
 
     public EnemyChaseState(EnemyStateMachine owner) : base(owner) { }
 
@@ -31,23 +31,21 @@ public class EnemyChaseState : EnemyBaseState
             return;
         }
 
-       
         if (dist > owner.loseRange)
         {
             lostTimer += Time.deltaTime;
             if (lostTimer >= LostGracePeriod)
             {
+                // Smooth transition directly back into your patrol pattern
                 owner.SwitchState(owner.PatrolState);
                 return;
             }
         }
         else
         {
-           
             lostTimer = 0f;
         }
 
-      
         updateTimer += Time.deltaTime;
         if (updateTimer >= Interval)
         {

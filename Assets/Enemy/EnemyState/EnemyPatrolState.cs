@@ -75,13 +75,17 @@ public class EnemyPatrolState : EnemyBaseState
                 owner.transform.position,
                 currentWaypoint.position
             );
-
             if (distToWaypoint <= owner.waypointStopDist + 0.3f)
             {
-               
                 arriving = true;
-                owner.agent.ResetPath();
-                owner.agent.velocity = Vector3.zero;
+
+                // ADDED SAFETY CHECK HERE:
+                if (owner.agent.isActiveAndEnabled)
+                {
+                    owner.agent.ResetPath();
+                    owner.agent.velocity = Vector3.zero;
+                }
+
                 owner.SwitchState(owner.IdleState, owner.idleAtWaypoint);
                 return;
             }

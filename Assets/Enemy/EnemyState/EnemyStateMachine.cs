@@ -12,6 +12,13 @@ public class EnemyStateMachine : MonoBehaviour
     [Header("Waypoints")]
     public Transform[] waypointTransforms;
 
+    [Header("Modular Attack Visual FX")]
+    [Tooltip("Drag the hit/slash/punch particle prefab here from your Project assets.")]
+    public GameObject punchParticlePrefab;
+
+    [Tooltip("Drag the enemy's hand/fist bone transform here to spawn the effect right at the fist. If left empty, it spawms at the enemy's chest position.")]
+    public Transform punchSpawnPoint;
+
     [Header("Settings")]
     public float patrolSpeed = 1.5f;
     public float chaseSpeed = 3.5f;
@@ -25,6 +32,9 @@ public class EnemyStateMachine : MonoBehaviour
     public float attackRange = 2f;
     public int attackDamage = 10;
 
+    // Added only this property to track state lock safely
+    public bool IsCurrentlyAttacking { get; set; } = false;
+
     public EnemyIdleState IdleState { get; private set; }
     public EnemyPatrolState PatrolState { get; private set; }
     public EnemyChaseState ChaseState { get; private set; }
@@ -33,12 +43,10 @@ public class EnemyStateMachine : MonoBehaviour
     EnemyBaseState currentState;
     private object owner;
 
-    
     public static readonly int HashIdle = Animator.StringToHash("Idle");
     public static readonly int HashPatrol = Animator.StringToHash("Patrol");
     public static readonly int HashChase = Animator.StringToHash("Chase");
     public static readonly int HashAttack = Animator.StringToHash("Attack");
-
 
     void Awake()
     {
@@ -79,16 +87,50 @@ public class EnemyStateMachine : MonoBehaviour
 
     public void SwitchState(EnemyBaseState newState, float context = 0f)
     {
+        // Don't interrupt mid-punch sequence
+        if (IsCurrentlyAttacking && newState != AttackState) return;
+
         currentState?.Exit();
         currentState = newState;
         currentState.Enter(context);
+    }
+    public void EnemyPunchDamageEvent()
+    {
+        // 1. Handle Visual Effects Modularly
+        if (punchParticlePrefab != null)
+        {
+            // Fallback to transform position if no fist transform bone anchor is assigned
+            Vector3 spawnPosition = punchSpawnPoint != null ? punchSpawnPoint.position : transform.position + Vector3.up;
+            Quaternion spawnRotation = punchSpawnPoint != null ? punchSpawnPoint.rotation : transform.rotation;
+
+            // Spawn the modular asset
+            GameObject spawnedFX = Instantiate(punchParticlePrefab, spawnPosition, spawnRotation);
+
+            // Clean it out of memory after 1.5 seconds automatically
+            Destroy(spawnedFX, 1.5f);
+        }
+
+        // 2. Handle Damage Calculations (Only if actively tracking inside AttackState)
+        if (IsCurrentlyAttacking && player != null)
+        {
+            float currentDist = Vector3.Distance(transform.position, player.position);
+
+            if (currentDist <= attackRange + 0.5f)
+            {
+                PlayerHealth health = player.GetComponent<PlayerHealth>();
+                if (health != null)
+                {
+                    health.TakeDamage(attackDamage);
+                    Debug.Log($"[Animation Event] Strike landed! Player hit for {attackDamage} damage.");
+                }
+            }
+        }
     }
 
     public bool PlayerInRange(float range) =>
         player != null &&
         Vector3.Distance(transform.position, player.position) <= range;
 
-   
     public void SetAnimator(bool idle, bool patrol, bool chase)
     {
         if (idle)
@@ -98,14 +140,15 @@ public class EnemyStateMachine : MonoBehaviour
         else if (chase)
             animator.Play("Chase", 0, 0f);
     }
+
     public void AlertAndChasePlayer()
     {
-        // If the enemy is already attacking or chasing, don't interrupt the cycle
         if (currentState == ChaseState || currentState == AttackState) return;
 
         Debug.Log($"[StateMachine] {name} was hit! Forcing ChaseState.");
         SwitchState(ChaseState);
     }
+
     public Transform GetRandomWaypoint(Transform last)
     {
         if (waypointTransforms.Length == 0) return null;

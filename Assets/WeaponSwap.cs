@@ -1,9 +1,16 @@
+using System; // REQUIRED for C# Action events
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class WeaponSwap : MonoBehaviour
 {
+    // =======================================================================
+    // THE OBSERVER PATTERN EVENT (BROADCASTER)
+    // Fires whenever weapons are added, swapped, or refreshed.
+    // =======================================================================
+    public event Action OnWeaponInventoryChanged;
+
     public List<GameObject> equippedWeapons = new List<GameObject>();
     private int currentWeaponIndex = 0;
 
@@ -12,6 +19,11 @@ public class WeaponSwap : MonoBehaviour
 
     void Start()
     {
+        // =======================================================================
+        // OBSERVER PATTERN: Subscribe to the static weapon pickup event stream
+        // =======================================================================
+        ItemPickable.OnWeaponPickedUp += AddWeaponToInventory;
+
         UpdateWeapon();
     }
 
@@ -90,15 +102,10 @@ public class WeaponSwap : MonoBehaviour
         }
 
         // =======================================================================
-        // TARGET DIRECT CALL: Refreshes your InventoryManager UI tracking slots!
+        // CHANGED TO EVENT BROADCAST: Shouts out that the UI needs a refresh!
+        // No more direct target calls or searching for InventoryManager components.
         // =======================================================================
-        InventoryManager inventory = GetComponent<InventoryManager>();
-        if (inventory == null) inventory = FindObjectOfType<InventoryManager>();
-
-        if (inventory != null)
-        {
-            inventory.UpdateInventoryUI();
-        }
+        OnWeaponInventoryChanged?.Invoke();
     }
 
     public void AddWeaponToInventory(GameObject weaponPrefab)
@@ -138,5 +145,13 @@ public class WeaponSwap : MonoBehaviour
         // Reset our slot tracking indicators back down to 0 safely
         currentWeaponIndex = 0;
         UpdateWeapon();
+    }
+
+    void OnDestroy()
+    {
+        // =======================================================================
+        // CRITICAL CLEANUP: Always unsubscribe from static events when leaving scene
+        // =======================================================================
+        ItemPickable.OnWeaponPickedUp -= AddWeaponToInventory;
     }
 }

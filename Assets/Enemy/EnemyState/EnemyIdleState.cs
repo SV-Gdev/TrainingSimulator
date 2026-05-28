@@ -11,15 +11,17 @@ public class EnemyIdleState : EnemyBaseState
 
     public override void Enter(float context)
     {
-        timer = 0f;
-        chaseCooldownTimer = 0f;
-        idleDuration = context > 0f ? context : owner.idleAfterPatrol;
+        // ... your existing timer setup code ...
 
-        owner.agent.ResetPath();
-        owner.agent.velocity = Vector3.zero;
-        owner.agent.isStopped = true;
+        // ADDED SAFETY CHECK HERE:
+        if (owner.agent.isActiveAndEnabled)
+        {
+            owner.agent.ResetPath();
+            owner.agent.velocity = Vector3.zero;
+            owner.agent.isStopped = true;
+        }
 
-        owner.animator.Play("Idle", 0, 0f);
+        owner.SetAnimator(true, false, false); // Assuming this is how you play Idle animation
     }
 
     public override void Update()

@@ -4,19 +4,28 @@ using UnityEngine;
 
 public class Grenade : MonoBehaviour
 {
-    float timer = 2;
+    [Header("Timer Settings")]
+    [SerializeField] float timer = 2f;
     float countdown;
-    float radius = 10f; // Adjusted to a realistic game distance unit (10 meters)
-    float force = 500;
 
-    // ==========================================
-    // NEW: Configuration for explosive damage
-    // ==========================================
+    [Header("Explosion Metrics")]
+    public float radius = 10f; // Outer boundary of the blast sphere
     public int maxDamage = 100;
+
+    [Header("Modular Pushback Settings")]
+    [Tooltip("The raw power of the explosion pushback.")]
+    public float pushbackForce = 500f;
+
+    [Tooltip("Applies an upward lift vector to objects, sending them airborne. 0 = flat push away.")]
+    public float upwardModifier = 1f;
+
+    [Tooltip("Impulse applies the entire force instantly, ignoring mass. Force applies it gradually based on object weight.")]
+    public ForceMode pushbackMode = ForceMode.Impulse;
 
     bool hasExploded;
     [HideInInspector] public bool isThrown = false;
 
+    [Header("Visual Effects")]
     [SerializeField] GameObject ExplodingParticle;
 
     void Start()
@@ -40,38 +49,65 @@ public class Grenade : MonoBehaviour
         hasExploded = true;
 
         // Spawn explosion visual FX particle layers
-        GameObject spawnedParticle = Instantiate(ExplodingParticle, transform.position, transform.rotation);
-        Destroy(spawnedParticle, 1);
+        if (ExplodingParticle != null)
+        {
+            GameObject spawnedParticle = Instantiate(ExplodingParticle, transform.position, transform.rotation);
+            Destroy(spawnedParticle, 1f);
+        }
 
-        // Scan the area for objects within the blast radius
+        // Scan the area for objects within the customizable blast radius
         Collider[] colliders = Physics.OverlapSphere(transform.position, radius);
         foreach (Collider nearbyObject in colliders)
         {
-            // 1. APPLY PHYSICS BLAST FORCE
+            // Calculate distance to scale both damage and pushback based on your radius
+            float distance = Vector3.Distance(transform.position, nearbyObject.transform.position);
+
+            // Falloff factor: 1 at epicenter, 0 at the absolute edge of the radius
+            float falloffFactor = 1f - (distance / radius);
+            falloffFactor = Mathf.Clamp01(falloffFactor);
+
+            // ==========================================
+            // 1. MODULAR PUSHBACK SYSTEM
+            // ==========================================
             Rigidbody rb = nearbyObject.GetComponent<Rigidbody>();
             if (rb != null)
             {
-                rb.AddExplosionForce(force, transform.position, radius);
+                // Scales pushback power relative to distance from explosion epicenter
+                float finalPushForce = pushbackForce * falloffFactor;
+
+                // Unity's native calculation handles direction, radius restrictions, and upward lifting vectors perfectly
+                rb.AddExplosionForce(
+                    finalPushForce,
+                    transform.position,
+                    radius,
+                    upwardModifier,
+                    pushbackMode
+                );
             }
 
-            // =======================================================================
-            // 2. APPLY DAMAGE TO ENEMIES
-            // Looks for your enemy script component and applies a falloff damage calculations
-            // =======================================================================
+            // ==========================================
+            // 2. DAMAGE CALCULATION
+            // ==========================================
             EnemyHealth enemy = nearbyObject.GetComponent<EnemyHealth>();
             if (enemy != null)
             {
-                // Calculate distance to scale damage (closer = more damage)
-                float distance = Vector3.Distance(transform.position, nearbyObject.transform.position);
-                float damagePercentage = 1f - (distance / radius);
-                int finalDamage = Mathf.RoundToInt(maxDamage * Mathf.Clamp01(damagePercentage));
-
-                // Send the damage value to the enemy!
+                int finalDamage = Mathf.RoundToInt(maxDamage * falloffFactor);
                 enemy.TakeDamage(finalDamage);
+
+                // Send the explosion details over to the enemy so they override their NavMesh!
+                float finalPushForce = pushbackForce * falloffFactor;
+                enemy.ApplyExplosionKnockback(transform.position, finalPushForce, radius, upwardModifier);
             }
         }
 
         // Remove the physical grenade from the scene
         Destroy(gameObject);
+    }
+
+    // Draw the blast circle in the Unity Editor scene tab for easier design debugging
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, radius);
     }
 }
