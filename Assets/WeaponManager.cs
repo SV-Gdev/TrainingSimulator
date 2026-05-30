@@ -7,9 +7,9 @@ public class WeaponManager : MonoBehaviour
     [Header("Weapon Data")]
     [SerializeField] WeaponData weaponData;
 
-    // References to your managers
+    
     WeaponClassManager weaponClass;
-    [HideInInspector] public WeaponSwap weaponSwap; // NEW: Added WeaponSwap reference
+    [HideInInspector] public WeaponSwap weaponSwap; 
 
     float fireRateTimer;
     [SerializeField] bool SemiAuto;
@@ -35,21 +35,21 @@ public class WeaponManager : MonoBehaviour
 
     private void OnEnable()
     {
-        // 1. Grab components from the parent player hierarchy cleanly
+        
         if (weaponClass == null) weaponClass = GetComponentInParent<WeaponClassManager>();
         if (weaponSwap == null) weaponSwap = GetComponentInParent<WeaponSwap>();
         if (Ammo == null) Ammo = GetComponent<weaponAmmo>();
         if (audioSource == null) audioSource = GetComponent<AudioSource>();
 
-        // 2. NEW AUTO-REFS FOR CLONES: Find scene objects that aren't on the prefab
+       
         if (aim == null)
         {
             aim = GetComponentInParent<AimManage>();
-            // If it's still null, look globally on your player character
+          
             if (aim == null) aim = GameObject.FindAnyObjectByType<AimManage>();
         }
 
-        // 3. Force weaponAmmo to find the UI text box right now
+       
         if (Ammo != null && Ammo.ammoDisplay == null)
         {
             GameObject displayObj = GameObject.Find("AmmoDisplay");
@@ -59,16 +59,16 @@ public class WeaponManager : MonoBehaviour
             }
         }
 
-        // 4. Safety Check execution for WeaponClassManager
+       
         if (weaponClass != null)
         {
             weaponClass.SelectCurrentWeapon(this);
         }
 
-        // 5. Force a UI update now that all links are restored!
+      
         if (Ammo != null)
         {
-            // Call the public update directly to push the new numbers to your HUD
+           
             Ammo.UpdateAmmoUI();
         }
     }
@@ -80,10 +80,10 @@ public class WeaponManager : MonoBehaviour
 
     bool ShouldFire()
     {
-        // 1. NEW SAFETY GUARD: If this weapon is NOT active in the world hierarchy, stop immediately!
+        
         if (!gameObject.activeInHierarchy) return false;
 
-        // 2. NEW INVENTORY GUARD: Double-check with WeaponSwap to make sure we are allowed to shoot
+       
         if (weaponSwap == null || weaponSwap.equippedWeapons.Count == 0) return false;
 
         fireRateTimer += Time.deltaTime;

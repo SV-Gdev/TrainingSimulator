@@ -24,10 +24,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] InventoryManager inventoryManager;
 
 
-    // public Camera playerCamera;
-
-    //public float lookSpeed = 2f;
-    // public float lookXLimit = 45f;
+    
 
     [HideInInspector] public Animator anim;
 
@@ -43,8 +40,7 @@ public class PlayerMovement : MonoBehaviour
         anim = GetComponentInChildren<Animator>();
         rb = GetComponent<Rigidbody>();
 
-       // Cursor.lockState = CursorLockMode.Locked;
-       // Cursor.visible = false;
+       
 
         SwitchState(Idle);
     }
@@ -52,7 +48,7 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         CheckGround();
-        //HandleLook(); 
+         
 
         currenttstate.UpdateState(this);
 
@@ -62,7 +58,7 @@ public class PlayerMovement : MonoBehaviour
         if (UnityEngine.Input.GetKey(KeyCode.E))
         {
 
-            //Ray ray = cam.ScreenPointToRay(new Vector3(Screen.width/2,Screen.height/2, 0));
+            
             Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
 
             RaycastHit hitinfo;
@@ -110,24 +106,19 @@ public class PlayerMovement : MonoBehaviour
     }
 
 
-    // void OnLook(InputValue value)
-    // {
-    //   //  lookInput = value.Get<Vector2>();
-    // }
+   
 
     void MovePlayer()
 {
-    // 1. Calculate direction based on player orientation
+    
     direction = transform.right * moveInput.x + transform.forward * moveInput.y;
     direction.Normalize();
 
-    // 2. Apply movement as a continuous force
-    // (We multiply by a factor like 10f just to make the acceleration snappy)
+   
     float forceMultiplier = 6f;
     rb.AddForce(direction * moveSpeed * forceMultiplier, ForceMode.Force);
 
-    // 3. Prevent the player from accelerating infinitely 
-    // We separate horizontal velocity from vertical (falling/jumping) velocity
+    
     Vector3 horizontalVelocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
     
     if (horizontalVelocity.magnitude > moveSpeed)
@@ -150,17 +141,5 @@ public class PlayerMovement : MonoBehaviour
     }
 
   
-    //void HandleLook()
-    //{
-       // float mouseX = lookInput.x * lookSpeed;
-       // float mouseY = lookInput.y * lookSpeed;
-
-       // rotationX -= mouseY;
-       // rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
-
-        
-        //playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
-
-        
-       // transform.Rotate(Vector3.up * mouseX);
+    
     }

@@ -39,7 +39,7 @@ public class InventoryManager : MonoBehaviour, IPointerDownHandler, IPointerUpHa
             }
             else
             {
-                Cursor.lockState = CursorLockMode.None; // Fixed compiler bitwise assignment error
+                Cursor.lockState = CursorLockMode.None; 
                 isInventoryOpened = true;
             }
         }
@@ -141,15 +141,13 @@ public class InventoryManager : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         }
     }
 
-    // =======================================================================
-    // ADDED METHOD: Syncs and destroys UI items when thrown or discarded!
-    // =======================================================================
+   
     public void UpdateInventoryUI()
     {
         WeaponSwap swapper = FindObjectOfType<WeaponSwap>();
         if (swapper == null) return;
 
-        // Loop through all UI slot boxes
+        
         for (int i = 0; i < slots.Length; i++)
         {
             if (slots[i] == null) continue;
@@ -159,7 +157,7 @@ public class InventoryManager : MonoBehaviour, IPointerDownHandler, IPointerUpHa
             InventoryItem uiItem = slotScript.HeldItem.GetComponent<InventoryItem>();
             if (uiItem != null && uiItem.ItemScriptableObject != null)
             {
-                // Check if this specific item type still exists anywhere inside backend array
+                
                 bool stillExistsInBackend = false;
                 foreach (GameObject weapon in swapper.equippedWeapons)
                 {
@@ -170,7 +168,7 @@ public class InventoryManager : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                     }
                 }
 
-                // If the backend weapon asset list doesn't have it anymore, delete its UI box layout!
+               
                 if (!stillExistsInBackend)
                 {
                     Destroy(slotScript.HeldItem);

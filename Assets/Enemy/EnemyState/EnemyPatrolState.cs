@@ -79,7 +79,7 @@ public class EnemyPatrolState : EnemyBaseState
             {
                 arriving = true;
 
-                // ADDED SAFETY CHECK HERE:
+                
                 if (owner.agent.isActiveAndEnabled)
                 {
                     owner.agent.ResetPath();

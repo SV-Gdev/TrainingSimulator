@@ -35,13 +35,13 @@ public class ActionState : MonoBehaviour
 
     void Update()
     {
-        // Check if player has a weapon equipped and verify if it's a grenade item type
+        
         if (currentWeapon != null && currentWeapon.gameObject.name.ToLower().Contains("grenade"))
         {
-            if (Input.GetMouseButtonDown(0)) // Left Mouse Click
+            if (Input.GetMouseButtonDown(0)) 
             {
                 SwitchState(TossGrenade);
-                return; // Exit early to bypass firearm shooting states
+                return; 
             }
         }
 
@@ -66,9 +66,7 @@ public class ActionState : MonoBehaviour
         currentState.EnterState(this);
     }
 
-    // =======================================================================
-    // REFACTORED ANIMATION EVENT: Detaches and throws the grenade you are holding!
-    // =======================================================================
+  
     public void LaunchGrenadeEvent()
     {
         WeaponSwap swapper = GetComponent<WeaponSwap>();
@@ -77,10 +75,10 @@ public class ActionState : MonoBehaviour
         GameObject heldGrenade = currentWeapon.gameObject;
         Grenade grenadeScript = heldGrenade.GetComponent<Grenade>();
 
-        // 1. Detach from your hand tracking bone structure
+       
         heldGrenade.transform.SetParent(null);
 
-        // 2. Reactivate physics simulations mid-air
+        
         BoxCollider boxCol = heldGrenade.GetComponent<BoxCollider>();
         if (boxCol != null) boxCol.enabled = true;
         else
@@ -89,7 +87,7 @@ public class ActionState : MonoBehaviour
             if (generalCol != null) generalCol.enabled = true;
         }
 
-        // Ensure gravity is enabled and kinematics are disabled on launch
+        
         Rigidbody rb = heldGrenade.GetComponent<Rigidbody>();
         if (rb != null)
         {
@@ -100,22 +98,20 @@ public class ActionState : MonoBehaviour
             rb.AddForce(physicalTrajectory, ForceMode.Impulse);
         }
 
-        // 3. Start the grenade explosion countdown timer ticking
+       
         if (grenadeScript != null)
         {
             grenadeScript.isThrown = true;
         }
 
-        // =======================================================================
-        // CLEANUP: Removes tracking and cascades down to WeaponSwap UI refreshes!
-        // =======================================================================
+        
         swapper.equippedWeapons.Remove(heldGrenade);
 
-        // Reset variables before triggering the weapon refresh 
+        
         currentWeapon = null;
         Ammo = null;
 
-        // This automatically recalibrates layout, loops, and updates UI via Step 2 alterations!
+       
         swapper.ForceWeaponRefreshAfterThrow();
     }
 
@@ -132,7 +128,7 @@ public class ActionState : MonoBehaviour
         if (weapon != null)
         {
             Ammo = weapon.Ammo;
-            // Hide the ammo values UI box text layer if holding a grenade item type
+            
             if (ammoUIPanel != null)
                 ammoUIPanel.SetActive(!weapon.gameObject.name.Contains("grenade"));
         }

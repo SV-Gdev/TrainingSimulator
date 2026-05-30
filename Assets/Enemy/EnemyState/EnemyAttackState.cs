@@ -10,7 +10,7 @@ public class EnemyAttackState : EnemyBaseState
 
     public override void Enter(float context)
     {
-        // Start from 0 so it plays through the entire punch cleanly
+        
         attackTimer = 0f;
         isAttacking = false;
 
@@ -18,7 +18,7 @@ public class EnemyAttackState : EnemyBaseState
         owner.agent.velocity = Vector3.zero;
         owner.agent.isStopped = true;
 
-        // Engage the state lock
+        
         owner.IsCurrentlyAttacking = true;
 
         owner.animator.Play("Attack", 0, 0f);
@@ -41,16 +41,16 @@ public class EnemyAttackState : EnemyBaseState
 
         attackTimer += Time.deltaTime;
 
-        // Apply your original damage checking structure when the timer completes a punch cycle
+      
         if (attackTimer >= attackCooldown)
         {
             attackTimer = 0f;
             PerformAttack();
 
-            // Unlock the engine tracking parameters BEFORE executing structural jumps
+          
             owner.IsCurrentlyAttacking = false;
 
-            // Smooth fallback routing evaluating where the target is located
+         
             if (distToPlayer > owner.loseRange)
             {
                 owner.SwitchState(owner.PatrolState);

@@ -35,19 +35,15 @@ public class weaponAmmo : MonoBehaviour
     {
         if (ammoDisplay != null) return;
 
-        // =======================================================================
-        // STRICTOR SEARCH: Find the Canvas first, then look specifically inside AmmoDisplay
-        // This stops it from accidentally grabbing the Score Manager!
-        // =======================================================================
         GameObject canvasObj = GameObject.Find("Canvas");
         if (canvasObj != null)
         {
-            // Search inside the Canvas for a child object named exactly "AmmoDisplay"
+            
             Transform ammoDisplayTransform = canvasObj.transform.Find("AmmoDisplay");
 
             if (ammoDisplayTransform != null)
             {
-                // Grab the text component off that specific object or its children
+                
                 ammoDisplay = ammoDisplayTransform.GetComponent<TextMeshProUGUI>();
                 if (ammoDisplay == null)
                 {
@@ -56,7 +52,7 @@ public class weaponAmmo : MonoBehaviour
             }
         }
 
-        // Emergency backup: ONLY look for objects explicitly named "AmmoDisplay"
+        
         if (ammoDisplay == null)
         {
             TextMeshProUGUI[] allTexts = Resources.FindObjectsOfTypeAll<TextMeshProUGUI>();
@@ -82,7 +78,7 @@ public class weaponAmmo : MonoBehaviour
 
         if (ammoDisplay == null || !gameObject.activeInHierarchy) return;
 
-        // Double check to make sure we didn't accidentally steal the Score text box
+       
         if (ammoDisplay.gameObject.name == "Score")
         {
             ammoDisplay = null;

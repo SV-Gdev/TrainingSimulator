@@ -36,7 +36,7 @@ public class EnemyChaseState : EnemyBaseState
             lostTimer += Time.deltaTime;
             if (lostTimer >= LostGracePeriod)
             {
-                // Smooth transition directly back into your patrol pattern
+                
                 owner.SwitchState(owner.PatrolState);
                 return;
             }

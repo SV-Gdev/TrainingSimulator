@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using static UnityEngine.UI.GridLayoutGroup;
 
-public class EnemyStateMachine : MonoBehaviour
+public class EnemyStateMachine : MonoBehaviour, IDataPersistence
 {
     [Header("Owner References")]
     public NavMeshAgent agent;
@@ -32,7 +32,7 @@ public class EnemyStateMachine : MonoBehaviour
     public float attackRange = 2f;
     public int attackDamage = 10;
 
-    // Added only this property to track state lock safely
+   
     public bool IsCurrentlyAttacking { get; set; } = false;
 
     public EnemyIdleState IdleState { get; private set; }
@@ -87,7 +87,7 @@ public class EnemyStateMachine : MonoBehaviour
 
     public void SwitchState(EnemyBaseState newState, float context = 0f)
     {
-        // Don't interrupt mid-punch sequence
+        
         if (IsCurrentlyAttacking && newState != AttackState) return;
 
         currentState?.Exit();
@@ -96,21 +96,21 @@ public class EnemyStateMachine : MonoBehaviour
     }
     public void EnemyPunchDamageEvent()
     {
-        // 1. Handle Visual Effects Modularly
+       
         if (punchParticlePrefab != null)
         {
-            // Fallback to transform position if no fist transform bone anchor is assigned
+           
             Vector3 spawnPosition = punchSpawnPoint != null ? punchSpawnPoint.position : transform.position + Vector3.up;
             Quaternion spawnRotation = punchSpawnPoint != null ? punchSpawnPoint.rotation : transform.rotation;
 
-            // Spawn the modular asset
+           
             GameObject spawnedFX = Instantiate(punchParticlePrefab, spawnPosition, spawnRotation);
 
-            // Clean it out of memory after 1.5 seconds automatically
+        
             Destroy(spawnedFX, 1.5f);
         }
 
-        // 2. Handle Damage Calculations (Only if actively tracking inside AttackState)
+        
         if (IsCurrentlyAttacking && player != null)
         {
             float currentDist = Vector3.Distance(transform.position, player.position);
@@ -147,6 +147,17 @@ public class EnemyStateMachine : MonoBehaviour
 
         Debug.Log($"[StateMachine] {name} was hit! Forcing ChaseState.");
         SwitchState(ChaseState);
+    }
+    public void SaveData(ref GameData data)
+    {
+        data.remainingEnemiesCount = GameObject.FindGameObjectsWithTag("Enemy").Length;
+
+        Debug.Log($"[Save System] EnemyStateMachine saving count: {data.remainingEnemiesCount}");
+    }
+
+    public void LoadData(GameData data)
+    {
+       
     }
 
     public Transform GetRandomWaypoint(Transform last)

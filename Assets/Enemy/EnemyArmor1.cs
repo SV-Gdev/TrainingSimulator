@@ -1,14 +1,11 @@
-using System; // REQUIRED for Action events
+using System; 
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyArmor1 : MonoBehaviour
 {
-    // =======================================================================
-    // THE OBSERVER PATTERN EVENT (BROADCASTER)
-    // Passes: (int scorePoints) so the ScoreManager knows how much to add
-    // =======================================================================
+   
     public event Action<int> OnEnemyArmorDeath;
 
     [SerializeField] public float armor;
@@ -52,9 +49,7 @@ public class EnemyArmor1 : MonoBehaviour
         {
             Debug.Log("Death");
 
-            // =======================================================================
-            // CHANGED TO EVENT BROADCAST: Instead of using .Instance, we fire the event!
-            // =======================================================================
+           
             OnEnemyArmorDeath?.Invoke(scoreValue);
 
             gameObject.SetActive(false);
