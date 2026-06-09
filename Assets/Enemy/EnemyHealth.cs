@@ -28,7 +28,7 @@ public class EnemyHealth : MonoBehaviour
        
         currentHealth -= Mathf.RoundToInt(damage);
 
-        // CHECK FOR DEATH CONDITION
+        
         if (currentHealth <= 0)
         {
             Die();

@@ -22,7 +22,7 @@ public class PlayerPersistenceController : MonoBehaviour, IDataPersistence
         if (agent != null) agent.enabled = false;
         if (cc != null) cc.enabled = false;
 
-        // Snap the player to the exact saved coordinates
+       
         this.transform.position = savedPosition;
         Debug.Log($"<color=cyan>[Player Load]</color> Restored position : {savedPosition}");
 
