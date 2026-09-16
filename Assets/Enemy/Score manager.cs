@@ -1,83 +1,52 @@
 using UnityEngine;
-using TMPro;
+using TMPro; // Include if using TextMeshPro for UI
 
-public class ScoreManager : MonoBehaviour, IDataPersistence
+public class ScoreManager : MonoBehaviour
 {
-    [Header("UI Reference")]
-    [Tooltip("Drag your 'New Text' UI GameObject into this slot.")]
-    [SerializeField] private TextMeshProUGUI scoreText;
+    public static ScoreManager Instance { get; private set; }
 
-    [Header("Score Data")]
-    private int totalScore = 0;
+    [Header("Score Settings")]
+    [SerializeField] private int currentScore = 0;
+    [SerializeField] private TextMeshProUGUI scoreText; // Optional UI reference
 
-    private EnemyHealth enemyHealthSource;
-    private EnemyArmor1 armoredEnemySource;
-
-    void Start()
+    private void Awake()
     {
-        UpdateScoreUI();
-
-        enemyHealthSource = FindObjectOfType<EnemyHealth>();
-        if (enemyHealthSource != null)
+        // Simple singleton setup
+        if (Instance != null && Instance != this)
         {
-            enemyHealthSource.OnEnemyDeath += HandleEnemyDeathEvent;
+            Destroy(gameObject);
+            return;
         }
-
-        armoredEnemySource = FindObjectOfType<EnemyArmor1>();
-        if (armoredEnemySource != null)
-        {
-            armoredEnemySource.OnEnemyArmorDeath += HandleArmoredEnemyDeath;
-        }
+        Instance = this;
     }
 
-    
-    public void LoadData(GameData data)
+    private void OnEnable()
     {
-        this.totalScore = data.totalScore;
-        UpdateScoreUI(); 
+        // Subscribe to the static event on EnemyHealthManager!
+        // No Find calls or Inspector references required.
+        EnemyHealthManager.OnEnemyKilled += AddScore;
     }
 
-    public void SaveData(ref GameData data)
+    private void OnDisable()
     {
-        data.totalScore = this.totalScore;
+        // Unsubscribe when disabled to prevent memory leaks
+        EnemyHealthManager.OnEnemyKilled -= AddScore;
     }
 
-    private void HandleEnemyDeathEvent(GameObject deadEnemy)
+    public void AddScore(int amount)
     {
-        totalScore += 10;
-        UpdateScoreUI();
-        Debug.Log($"[Event Received] Base enemy died. Score is now: {totalScore}");
+        currentScore += amount;
+        UpdateUI();
+        Debug.Log($"[ScoreManager] Score added: {amount}. Current Score: {currentScore}");
     }
 
-    private void HandleArmoredEnemyDeath(int pointsGained)
-    {
-        totalScore += pointsGained;
-        UpdateScoreUI();
-        Debug.Log($"[Event Received] Armored enemy died. Score is now: {totalScore}");
-    }
-
-    private void UpdateScoreUI()
+    private void UpdateUI()
     {
         if (scoreText != null)
         {
-            scoreText.text = "Score: " + totalScore;
-        }
-        else
-        {
-            Debug.LogWarning("[ScoreManager] Missing UI Text component reference in the Inspector!");
+            scoreText.text = $"Score: {currentScore}";
         }
     }
 
-    void OnDestroy()
-    {
-        if (enemyHealthSource != null)
-        {
-            enemyHealthSource.OnEnemyDeath -= HandleEnemyDeathEvent;
-        }
-
-        if (armoredEnemySource != null)
-        {
-            armoredEnemySource.OnEnemyArmorDeath -= HandleArmoredEnemyDeath;
-        }
-    }
+    public int GetScore() => currentScore;
 }

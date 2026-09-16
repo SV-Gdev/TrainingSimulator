@@ -15,6 +15,7 @@ public class ActionState : MonoBehaviour
     [HideInInspector] public Animator anim;
 
     [Header("UI Reference")]
+    // Assign this in the Unity Inspector!
     public GameObject ammoUIPanel;
 
     [Header("Dynamic Throw Force Configuration")]
@@ -25,23 +26,19 @@ public class ActionState : MonoBehaviour
     {
         anim = GetComponent<Animator>();
 
-        if (ammoUIPanel == null)
-        {
-            ammoUIPanel = GameObject.Find("AmmoDisplay");
-        }
+        // GameObject.Find REMOVED. We now rely on the Inspector assignment.
 
         SwitchState(Default);
     }
 
     void Update()
     {
-        
         if (currentWeapon != null && currentWeapon.gameObject.name.ToLower().Contains("grenade"))
         {
-            if (Input.GetMouseButtonDown(0)) 
+            if (Input.GetMouseButtonDown(0))
             {
                 SwitchState(TossGrenade);
-                return; 
+                return;
             }
         }
 
@@ -66,7 +63,6 @@ public class ActionState : MonoBehaviour
         currentState.EnterState(this);
     }
 
-  
     public void LaunchGrenadeEvent()
     {
         WeaponSwap swapper = GetComponent<WeaponSwap>();
@@ -75,10 +71,8 @@ public class ActionState : MonoBehaviour
         GameObject heldGrenade = currentWeapon.gameObject;
         Grenade grenadeScript = heldGrenade.GetComponent<Grenade>();
 
-       
         heldGrenade.transform.SetParent(null);
 
-        
         BoxCollider boxCol = heldGrenade.GetComponent<BoxCollider>();
         if (boxCol != null) boxCol.enabled = true;
         else
@@ -87,7 +81,6 @@ public class ActionState : MonoBehaviour
             if (generalCol != null) generalCol.enabled = true;
         }
 
-        
         Rigidbody rb = heldGrenade.GetComponent<Rigidbody>();
         if (rb != null)
         {
@@ -98,20 +91,16 @@ public class ActionState : MonoBehaviour
             rb.AddForce(physicalTrajectory, ForceMode.Impulse);
         }
 
-       
         if (grenadeScript != null)
         {
             grenadeScript.isThrown = true;
         }
 
-        
         swapper.equippedWeapons.Remove(heldGrenade);
 
-        
         currentWeapon = null;
         Ammo = null;
 
-       
         swapper.ForceWeaponRefreshAfterThrow();
     }
 
@@ -128,7 +117,7 @@ public class ActionState : MonoBehaviour
         if (weapon != null)
         {
             Ammo = weapon.Ammo;
-            
+
             if (ammoUIPanel != null)
                 ammoUIPanel.SetActive(!weapon.gameObject.name.Contains("grenade"));
         }
@@ -138,4 +127,4 @@ public class ActionState : MonoBehaviour
             if (ammoUIPanel != null) ammoUIPanel.SetActive(false);
         }
     }
-}
+}   

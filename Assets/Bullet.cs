@@ -4,45 +4,37 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    [SerializeField] float TimeToDestroy;
+    [SerializeField] private float timeToDestroy = 3f;
     [HideInInspector] public WeaponManager weapon;
 
     void Start()
     {
-        Destroy(this.gameObject, TimeToDestroy);
+        Destroy(gameObject, timeToDestroy);
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        
-        EnemyHealth enemyHealth = collision.gameObject.GetComponentInParent<EnemyHealth>();
-        if (enemyHealth != null)
-        {
-            enemyHealth.TakeDamage(weapon.damage);
+        Debug.Log($"[Bullet] Crashed into: {collision.gameObject.name} | Tag: {collision.gameObject.tag}");
 
-            
-            EnemyStateMachine stateMachine = collision.gameObject.GetComponentInParent<EnemyStateMachine>();
-            if (stateMachine != null)
-            {
-                stateMachine.AlertAndChasePlayer();
-            }
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            return;
         }
 
-       
-        EnemyArmor1 enemyArmor1 = collision.gameObject.GetComponentInParent<EnemyArmor1>();
-        if (enemyArmor1 != null)
+        // 1. Send damage to the central EnemyHealthManager via Singleton instance
+        if (EnemyHealthManager.Instance != null && weapon != null)
         {
-            enemyArmor1.TakeDamage(weapon.damage);
-
-          
-            EnemyStateMachine stateMachine = collision.gameObject.GetComponentInParent<EnemyStateMachine>();
-            if (stateMachine != null)
-            {
-                stateMachine.AlertAndChasePlayer();
-            }
+            EnemyHealthManager.Instance.TakeDamage(collision.gameObject, weapon.damage);
         }
 
-       
-        Destroy(this.gameObject);
+        // 2. Alert the enemy AI when shot (runs independently)
+        EnemyStateMachine stateMachine = collision.gameObject.GetComponentInParent<EnemyStateMachine>();
+        if (stateMachine != null)
+        {
+            stateMachine.AlertAndChasePlayer();
+        }
+
+        // 3. Destroy the bullet on impact
+        Destroy(gameObject);
     }
 }

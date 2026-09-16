@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: M416
   icon: {fileID: 21300000, guid: 717584de8295f404d91621b9e09c2ee2, type: 3}
-  equippedWeaponPrefab: {fileID: 4276591245663286670, guid: 5b29788734907ce4abb18d13fd9e9fba,
+  equippedWeaponPrefab: {fileID: 6532041889033574383, guid: d025849afc635af448c1c798f377a0ee,
     type: 3}

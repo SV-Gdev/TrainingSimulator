@@ -23,15 +23,17 @@ public class EnemyPatrolState : EnemyBaseState
         currentWaypoint = null;
         lastPosition = owner.transform.position;
 
-        owner.agent.isStopped = false;
-        owner.agent.speed = owner.patrolSpeed;
-        owner.agent.stoppingDistance = owner.waypointStopDist;
+        // FIX 1: Safety check before modifying agent properties (Fixes "Resume" error)
+        if (owner.agent != null && owner.agent.isActiveAndEnabled && owner.agent.isOnNavMesh)
+        {
+            owner.agent.isStopped = false;
+            owner.agent.speed = owner.patrolSpeed;
+            owner.agent.stoppingDistance = owner.waypointStopDist;
+        }
 
-    
         owner.animator.Play("Patrol", 0, 0f);
 
         GoToNextWaypoint();
-       
     }
 
     public override void Update()
@@ -51,23 +53,23 @@ public class EnemyPatrolState : EnemyBaseState
 
         if (patrolTimer >= owner.patrolDuration)
         {
-           
             arriving = true;
             owner.SwitchState(owner.IdleState, owner.idleAfterPatrol);
             return;
         }
 
-        
         if (stuckTimer >= StuckInterval)
         {
             float d = currentWaypoint != null
                 ? Vector3.Distance(owner.transform.position, currentWaypoint.position)
                 : -1f;
-
-           
         }
 
-        if (owner.agent.pathPending) return;
+        // Safety check before checking path status
+        if (owner.agent != null && owner.agent.isActiveAndEnabled && owner.agent.isOnNavMesh)
+        {
+            if (owner.agent.pathPending) return;
+        }
 
         if (currentWaypoint != null)
         {
@@ -75,12 +77,13 @@ public class EnemyPatrolState : EnemyBaseState
                 owner.transform.position,
                 currentWaypoint.position
             );
+
             if (distToWaypoint <= owner.waypointStopDist + 0.3f)
             {
                 arriving = true;
 
-                
-                if (owner.agent.isActiveAndEnabled)
+                // FIX 2: Safety check before resetting path (Fixes "ResetPath" error)
+                if (owner.agent != null && owner.agent.isActiveAndEnabled && owner.agent.isOnNavMesh)
                 {
                     owner.agent.ResetPath();
                     owner.agent.velocity = Vector3.zero;
@@ -93,7 +96,6 @@ public class EnemyPatrolState : EnemyBaseState
 
         if (waypointTimer >= owner.waypointTimeout)
         {
-           
             GoToNextWaypoint();
             return;
         }
@@ -103,7 +105,6 @@ public class EnemyPatrolState : EnemyBaseState
             float moved = Vector3.Distance(owner.transform.position, lastPosition);
             if (moved < StuckThreshold)
             {
-                
                 GoToNextWaypoint();
             }
             lastPosition = owner.transform.position;
@@ -113,9 +114,10 @@ public class EnemyPatrolState : EnemyBaseState
 
     public override void Exit()
     {
-       
-        arriving = false;
-        owner.agent.ResetPath();
+        if (owner != null && owner.agent != null && owner.agent.isActiveAndEnabled && owner.agent.isOnNavMesh)
+        {
+            owner.agent.ResetPath();
+        }
     }
 
     void GoToNextWaypoint()
@@ -124,9 +126,12 @@ public class EnemyPatrolState : EnemyBaseState
         if (next == null) return;
 
         currentWaypoint = next;
-        owner.agent.SetDestination(currentWaypoint.position);
 
-       
+        // FIX 3: Safety check before setting destination (Fixes "SetDestination" error)
+        if (owner.agent != null && owner.agent.isActiveAndEnabled && owner.agent.isOnNavMesh)
+        {
+            owner.agent.SetDestination(currentWaypoint.position);
+        }
 
         waypointTimer = 0f;
         stuckTimer = 0f;

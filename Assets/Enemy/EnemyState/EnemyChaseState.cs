@@ -11,12 +11,21 @@ public class EnemyChaseState : EnemyBaseState
 
     public override void Enter(float context)
     {
-        updateTimer = 0f;
+        // FIX: Reset timers every time the enemy starts chasing!
+        // This ensures they don't instantly give up because of old memory.
         lostTimer = 0f;
-        owner.agent.isStopped = false;
-        owner.agent.speed = owner.chaseSpeed;
-        owner.agent.stoppingDistance = owner.attackRange;
-        owner.animator.Play("Chase", 0, 0f);
+        updateTimer = 0f;
+
+        if (owner != null && owner.agent != null && owner.agent.isActiveAndEnabled && owner.agent.isOnNavMesh)
+        {
+            owner.agent.isStopped = false;
+        }
+
+        // Trigger the chase animation
+        if (owner != null && owner.animator != null)
+        {
+            owner.animator.Play("Chase", 0, 0f);
+        }
     }
 
     public override void Update()
@@ -36,7 +45,6 @@ public class EnemyChaseState : EnemyBaseState
             lostTimer += Time.deltaTime;
             if (lostTimer >= LostGracePeriod)
             {
-                
                 owner.SwitchState(owner.PatrolState);
                 return;
             }
@@ -47,17 +55,20 @@ public class EnemyChaseState : EnemyBaseState
         }
 
         updateTimer += Time.deltaTime;
-        if (updateTimer >= Interval)
+
+        if (owner != null && owner.agent != null && owner.agent.isActiveAndEnabled && owner.agent.isOnNavMesh)
         {
             owner.agent.SetDestination(owner.player.position);
-            updateTimer = 0f;
         }
     }
 
     public override void Exit()
     {
-        owner.agent.stoppingDistance = owner.waypointStopDist;
-        owner.agent.ResetPath();
-        owner.agent.velocity = Vector3.zero;
+        if (owner != null && owner.agent != null && owner.agent.isActiveAndEnabled && owner.agent.isOnNavMesh)
+        {
+            owner.agent.stoppingDistance = owner.waypointStopDist;
+            owner.agent.ResetPath();
+            owner.agent.velocity = Vector3.zero;
+        }
     }
 }

@@ -11,17 +11,17 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 3adc8747239a3b045acabcbd215ec541,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.36
+      value: -11.891667
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 3adc8747239a3b045acabcbd215ec541,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.17
+      value: -2.173
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 3adc8747239a3b045acabcbd215ec541,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -27.17
+      value: -21.299776
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 3adc8747239a3b045acabcbd215ec541,
         type: 3}
@@ -31,7 +31,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 3adc8747239a3b045acabcbd215ec541,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 3adc8747239a3b045acabcbd215ec541,
         type: 3}
@@ -88,11 +88,11 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 3adc8747239a3b045acabcbd215ec541,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: -597779438525550983}
+      addedObject: {fileID: 709395010560871552}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 3adc8747239a3b045acabcbd215ec541,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 7299530895287433688}
+      addedObject: {fileID: 2038119287275068744}
   m_SourcePrefab: {fileID: 100100000, guid: 3adc8747239a3b045acabcbd215ec541, type: 3}
 --- !u!1 &364694234584686244 stripped
 GameObject:
@@ -112,6 +112,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd366a013ed7dc74599bf1f949ed8658, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  timer: 2
+  radius: 12.7
+  maxDamage: 100
+  pushbackForce: 1058.3
+  upwardModifier: 15.95
+  pushbackMode: 5
   isThrown: 0
   ExplodingParticle: {fileID: 1620140131458704099, guid: 57e5b83dfee152a47aedf7d83c83e9f5,
     type: 3}
@@ -141,7 +147,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!65 &3343248782957958139
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -163,7 +169,36 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.13489822, y: 0.17044617, z: 0.11708762}
   m_Center: {x: -0.008905295, y: 0.027728997, z: -0.00057170726}
---- !u!114 &-597779438525550983
+--- !u!114 &709395010560871552
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 364694234584686244}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d831fd71880f1140b111db4c51d4635, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  category: 1
+  weaponData: {fileID: 11400000, guid: 847f928ea4c73b840b38b12775955bba, type: 2}
+  SemiAuto: 0
+  damage: 20
+  firerate: 0.2
+  BarrelPos: {fileID: 0}
+  throwablePrefab: {fileID: 364694234584686244}
+  throwForce: 15
+  throwUpwardForce: 5
+  bulletPrefab: {fileID: 0}
+  GunShot: {fileID: 0}
+  audioSource: {fileID: 0}
+  leftHandTarget: {fileID: 5172525826414709473, guid: 37b113db945d1794cb87685af0f447ee,
+    type: 3}
+  leftHandHint: {fileID: 7984490644469416472, guid: e2e5b2c9cc2c508479b5af77a7cecba2,
+    type: 3}
+  Ammo: {fileID: 0}
+--- !u!114 &2038119287275068744
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -177,27 +212,3 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemScriptableObject: {fileID: 11400000, guid: 0ebff9393389d6e4089ac086fc9b3c44,
     type: 2}
---- !u!114 &7299530895287433688
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 364694234584686244}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 486f4bb1a58e9a542ab94c75565db6f6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  weaponData: {fileID: 11400000, guid: 847f928ea4c73b840b38b12775955bba, type: 2}
-  weaponSwap: {fileID: 0}
-  SemiAuto: 0
-  bullet: {fileID: 0}
-  BarrelPos: {fileID: 0}
-  damage: 20
-  GunShot: {fileID: 0}
-  Ammo: {fileID: 0}
-  leftHandTarget: {fileID: 5172525826414709473, guid: 37b113db945d1794cb87685af0f447ee,
-    type: 3}
-  leftHandHint: {fileID: 7984490644469416472, guid: e2e5b2c9cc2c508479b5af77a7cecba2,
-    type: 3}

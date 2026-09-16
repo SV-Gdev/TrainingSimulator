@@ -19,6 +19,8 @@ public class EnemyStateMachine : MonoBehaviour, IDataPersistence
     [Tooltip("Drag the enemy's hand/fist bone transform here to spawn the effect right at the fist. If left empty, it spawms at the enemy's chest position.")]
     public Transform punchSpawnPoint;
 
+
+
     [Header("Settings")]
     public float patrolSpeed = 1.5f;
     public float chaseSpeed = 3.5f;
@@ -143,10 +145,14 @@ public class EnemyStateMachine : MonoBehaviour, IDataPersistence
 
     public void AlertAndChasePlayer()
     {
-        if (currentState == ChaseState || currentState == AttackState) return;
+        // Change 'CurrentState' to match the exact spelling/casing in your script
+        if (currentState != ChaseState && currentState != AttackState)
+        {
+            Debug.Log($"[StateMachine] {gameObject.name} was hit! Forcing ChaseState.");
 
-        Debug.Log($"[StateMachine] {name} was hit! Forcing ChaseState.");
-        SwitchState(ChaseState);
+            // Force the enemy into the chase state
+            SwitchState(ChaseState);
+        }
     }
     public void SaveData(ref GameData data)
     {
