@@ -10,7 +10,7 @@ public class weaponAmmo : MonoBehaviour
     public int currentAmmo;
 
     [Header("UI")]
-    public TextMeshProUGUI ammoDisplay;
+    [SerializeField] private TextMeshProUGUI ammoDisplay;
 
     void Start()
     {
@@ -38,30 +38,28 @@ public class weaponAmmo : MonoBehaviour
         GameObject canvasObj = GameObject.Find("Canvas");
         if (canvasObj != null)
         {
-            
+           
             Transform ammoDisplayTransform = canvasObj.transform.Find("AmmoDisplay");
-
             if (ammoDisplayTransform != null)
             {
-                
                 ammoDisplay = ammoDisplayTransform.GetComponent<TextMeshProUGUI>();
                 if (ammoDisplay == null)
                 {
                     ammoDisplay = ammoDisplayTransform.GetComponentInChildren<TextMeshProUGUI>(true);
                 }
             }
-        }
 
-        
-        if (ammoDisplay == null)
-        {
-            TextMeshProUGUI[] allTexts = Resources.FindObjectsOfTypeAll<TextMeshProUGUI>();
-            foreach (var txt in allTexts)
+           
+            if (ammoDisplay == null)
             {
-                if (txt.gameObject.name == "AmmoDisplay")
+                TextMeshProUGUI[] canvasTexts = canvasObj.GetComponentsInChildren<TextMeshProUGUI>(true);
+                foreach (var txt in canvasTexts)
                 {
-                    ammoDisplay = txt;
-                    break;
+                    if (txt.gameObject.name == "AmmoDisplay")
+                    {
+                        ammoDisplay = txt;
+                        break;
+                    }
                 }
             }
         }
@@ -78,7 +76,6 @@ public class weaponAmmo : MonoBehaviour
 
         if (ammoDisplay == null || !gameObject.activeInHierarchy) return;
 
-       
         if (ammoDisplay.gameObject.name == "Score")
         {
             ammoDisplay = null;

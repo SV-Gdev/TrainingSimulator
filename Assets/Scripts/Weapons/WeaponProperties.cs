@@ -10,13 +10,13 @@ public enum WeaponCategory
 public class WeaponProperties : MonoBehaviour
 {
     [Header("Weapon Identity")]
-    public WeaponCategory category = WeaponCategory.Firearm; // Changed to lowercase 'category'
+    public WeaponCategory category = WeaponCategory.Firearm; 
 
     [Header("Weapon Data")]
-    public WeaponData weaponData; // Changed from 'Object' to 'WeaponData' so C# recognizes .firerate
+    public WeaponData weaponData; 
     public bool SemiAuto;
     public float damage = 20;
-    public float firerate = 0.2f; // Added direct firerate field as well
+    public float firerate = 0.2f; 
 
     [Header("Firearm Properties")]
     public Transform BarrelPos;

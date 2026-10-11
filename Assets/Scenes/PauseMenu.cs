@@ -11,12 +11,10 @@ public class PauseMenu : MonoBehaviour
     bool isPaused = false;
 
     [Header("Override Popup Elements")]
-   
     [SerializeField] private GameObject overrideWarningPanel;
 
     void Start()
     {
-        
         if (DataPersistenceManager.Instance == null)
         {
             DataPersistenceManager existingManager = FindObjectOfType<DataPersistenceManager>();
@@ -29,7 +27,6 @@ public class PauseMenu : MonoBehaviour
             }
         }
 
-       
         if (overrideWarningPanel != null)
         {
             overrideWarningPanel.SetActive(false);
@@ -50,12 +47,14 @@ public class PauseMenu : MonoBehaviour
     public void Resume()
     {
         pauseMenuUI.SetActive(false);
-
-        
         if (overrideWarningPanel != null) overrideWarningPanel.SetActive(false);
 
         Time.timeScale = 1f;
         isPaused = false;
+
+      
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     public void Pause()
@@ -63,29 +62,27 @@ public class PauseMenu : MonoBehaviour
         pauseMenuUI.SetActive(true);
         Time.timeScale = 0f;
         isPaused = true;
+
+       
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
-   
     public void OnClickSaveButton()
     {
         if (DataPersistenceManager.Instance != null)
         {
-            
             if (DataPersistenceManager.Instance.CurrentSlotHasSaveFile())
             {
-                
                 if (pauseMenuUI != null) pauseMenuUI.SetActive(false);
 
-              
                 if (overrideWarningPanel != null)
                 {
                     overrideWarningPanel.SetActive(true);
                 }
-                
             }
             else
             {
-               
                 ExecuteSavePipeline();
             }
         }
@@ -95,34 +92,24 @@ public class PauseMenu : MonoBehaviour
         }
     }
 
-   
     public void ClickedConfirmOverrideYes()
     {
         if (overrideWarningPanel != null) overrideWarningPanel.SetActive(false);
-
-       
         if (pauseMenuUI != null) pauseMenuUI.SetActive(true);
 
-       
         ExecuteSavePipeline();
     }
 
     public void ClickedCancelOverrideNo()
     {
         if (overrideWarningPanel != null) overrideWarningPanel.SetActive(false);
-
-       
         if (pauseMenuUI != null) pauseMenuUI.SetActive(true);
-
-       
     }
 
-   
     private void ExecuteSavePipeline()
     {
         if (DataPersistenceManager.Instance != null)
         {
-           
             DataPersistenceManager.Instance.SaveGame();
             Debug.Log("<color=green>[Save System]</color> Game saved successfully!");
         }
@@ -137,6 +124,8 @@ public class PauseMenu : MonoBehaviour
         }
 
         Time.timeScale = 1f;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
         SceneManager.LoadScene(mainMenuScene);
     }
 
@@ -148,8 +137,9 @@ public class PauseMenu : MonoBehaviour
         }
 
         Time.timeScale = 1f;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
         Application.Quit();
-        SceneManager.LoadScene(mainMenuScene);
         Debug.Log("Quit");
     }
-}
+}   

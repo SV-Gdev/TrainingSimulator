@@ -43,6 +43,34 @@ public class Grenade : MonoBehaviour
         }
     }
 
+   
+    public void Throw(float throwForce = 15f)
+    {
+        
+        transform.SetParent(null);
+
+        
+        Collider[] colliders = GetComponentsInChildren<Collider>();
+        foreach (Collider col in colliders)
+        {
+            col.enabled = true;
+        }
+
+       
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.isKinematic = false;
+            rb.useGravity = true;
+
+            Transform camTransform = Camera.main != null ? Camera.main.transform : transform;
+            rb.AddForce(camTransform.forward * throwForce + Vector3.up * 3f, ForceMode.VelocityChange);
+        }
+
+       
+        isThrown = true;
+    }
+
     public void Explode()
     {
         hasExploded = true;
@@ -63,7 +91,7 @@ public class Grenade : MonoBehaviour
             float distance = Vector3.Distance(transform.position, nearbyObject.transform.position);
             float falloffFactor = Mathf.Clamp01(1f - (distance / radius));
 
-            // 1. APPLY PHYSICS TO RIGIDBODIES
+           
             Rigidbody rb = nearbyObject.GetComponentInParent<Rigidbody>();
 
             if (rb != null && !processedRigidbodies.Contains(rb))
@@ -86,7 +114,7 @@ public class Grenade : MonoBehaviour
                 );
             }
 
-            // 2. DAMAGE AND KNOCKBACK VIA EnemyHealthManager Singleton
+           
             if (EnemyHealthManager.Instance != null && !processedHitObjects.Contains(nearbyObject.gameObject))
             {
                 processedHitObjects.Add(nearbyObject.gameObject);
@@ -98,7 +126,7 @@ public class Grenade : MonoBehaviour
                 EnemyHealthManager.Instance.ApplyExplosionKnockback(transform.position, finalPushForce, radius, upwardModifier, nearbyObject.gameObject);
             }
 
-            // 3. Alert the enemy AI when damaged by explosion
+           
             EnemyStateMachine stateMachine = nearbyObject.GetComponentInParent<EnemyStateMachine>();
             if (stateMachine != null)
             {

@@ -32,13 +32,35 @@ public class ItemPickable : MonoBehaviour
     {
         if (other.CompareTag("Player") && itemScriptableObject != null)
         {
+            InventoryManager invManager = FindObjectOfType<InventoryManager>();
+            if (invManager != null)
+            {
+               
+                if (invManager.HasItem(itemScriptableObject))
+                {
+                    Debug.Log($"[Pickup Blocked] You already own '{itemScriptableObject.name}'. Pickup ignored.");
+                    return; 
+                }
+            }
+
             if (itemScriptableObject.equippedWeaponPrefab != null)
             {
-                OnWeaponPickedUp?.Invoke(itemScriptableObject.equippedWeaponPrefab);
+               
+                if (itemScriptableObject.isWeapon)
+                {
+                    OnWeaponPickedUp?.Invoke(itemScriptableObject.equippedWeaponPrefab);
+                   
+                }
 
-                Debug.Log($"[Event Shouted] Weapon '{itemScriptableObject.name}' picked up. Notifying observers.");
-
-                Destroy(gameObject);
+               
+                if (invManager != null)
+                {
+                    invManager.ItemPicked(gameObject);
+                }
+                else
+                {
+                    Destroy(gameObject);
+                }
             }
             else
             {

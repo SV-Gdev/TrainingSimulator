@@ -21,20 +21,20 @@ public class Bullet : MonoBehaviour
             return;
         }
 
-        // 1. Send damage to the central EnemyHealthManager via Singleton instance
+        
         if (EnemyHealthManager.Instance != null && weapon != null)
         {
             EnemyHealthManager.Instance.TakeDamage(collision.gameObject, weapon.damage);
         }
 
-        // 2. Alert the enemy AI when shot (runs independently)
+      
         EnemyStateMachine stateMachine = collision.gameObject.GetComponentInParent<EnemyStateMachine>();
         if (stateMachine != null)
         {
             stateMachine.AlertAndChasePlayer();
         }
 
-        // 3. Destroy the bullet on impact
+       
         Destroy(gameObject);
     }
 }

@@ -15,7 +15,7 @@ public class ActionState : MonoBehaviour
     [HideInInspector] public Animator anim;
 
     [Header("UI Reference")]
-    // Assign this in the Unity Inspector!
+    
     public GameObject ammoUIPanel;
 
     [Header("Dynamic Throw Force Configuration")]
@@ -26,7 +26,7 @@ public class ActionState : MonoBehaviour
     {
         anim = GetComponent<Animator>();
 
-        // GameObject.Find REMOVED. We now rely on the Inspector assignment.
+        
 
         SwitchState(Default);
     }

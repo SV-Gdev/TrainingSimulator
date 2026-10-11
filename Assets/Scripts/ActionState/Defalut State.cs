@@ -4,13 +4,11 @@ public class DefaultState : ActionBase
 {
     public override void EnterState(ActionState actions)
     {
-        // Setup code if needed when entering Default state
+        
     }
 
     public override void UpdateState(ActionState actions)
     {
-        // Check for Reloading ONLY. 
-        // WeaponManager.cs handles all shooting logic automatically!
         if (Input.GetKeyDown(KeyCode.R) && CanReload(actions))
         {
             actions.SwitchState(actions.Reload);

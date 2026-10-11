@@ -14,11 +14,15 @@ public class PlayerHealth : MonoBehaviour, IDataPersistence
     public GameObject deathPanel;
     public Button restartButton;
 
+    [Header("Instant Death Hazard")]
+    [SerializeField] private BoxCollider instantDeathCollider; // Drag your hazard's Box Collider here
+
     private bool isDead = false;
 
-    // =======================================================================
-    // FIXED: Added Self-Registration lifecycle methods
-    // =======================================================================
+    // Reduced delay for standard hits
+    private float damageCooldown = 0.5f;
+    private float lastDamageTime;
+
     private void OnEnable()
     {
         if (DataPersistenceManager.Instance != null)
@@ -37,7 +41,6 @@ public class PlayerHealth : MonoBehaviour, IDataPersistence
 
     public void LoadData(GameData data)
     {
-        // Pulls the saved health safely from your JSON profile
         this.currentHealth = (int)data.activeRunHealth;
 
         if (healthSlider != null)
@@ -59,8 +62,6 @@ public class PlayerHealth : MonoBehaviour, IDataPersistence
             healthSlider.maxValue = maxHealth;
         }
 
-        // If it's a completely fresh game slot, saved data will be 0.
-        // In that specific case, initialize them to max health!
         if (this.currentHealth <= 0 && !isDead)
         {
             currentHealth = maxHealth;
@@ -75,10 +76,47 @@ public class PlayerHealth : MonoBehaviour, IDataPersistence
         if (restartButton != null) restartButton.onClick.AddListener(RestartGame);
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        if (isDead) return;
+
+        // Triggers instant death if the player touches the referenced box collider
+        if (instantDeathCollider != null && other == instantDeathCollider)
+        {
+            Die();
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (isDead) return;
+
+        // Collides instant death if the player touches the referenced box collider
+        if (instantDeathCollider != null && collision.collider == instantDeathCollider)
+        {
+            Die();
+        }
+    }
+
     public void TakeDamage(int amount)
     {
         if (isDead) return;
 
+        if (Time.time - lastDamageTime < damageCooldown) return;
+        lastDamageTime = Time.time;
+
+        ApplyDamage(amount);
+    }
+
+    // Dedicated method for continuous environmental hazards (like lasers) that bypasses standard hit cooldowns
+    public void TakeContinuousDamage(int amount)
+    {
+        if (isDead) return;
+        ApplyDamage(amount);
+    }
+
+    private void ApplyDamage(int amount)
+    {
         currentHealth -= amount;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
 
@@ -95,19 +133,21 @@ public class PlayerHealth : MonoBehaviour, IDataPersistence
     {
         isDead = true;
 
-        PlayerInput input = new PlayerInput();
-        input.Onfoot.Disable();
-        input.OnInventory.Disable();
-
         if (deathPanel != null)
             deathPanel.SetActive(true);
 
         Time.timeScale = 0f;
+
+        // Unlock and show cursor so the Restart button can be clicked
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     void RestartGame()
     {
         Time.timeScale = 1f;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }

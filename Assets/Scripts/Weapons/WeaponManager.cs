@@ -19,7 +19,7 @@ public class WeaponManager : MonoBehaviour
     private float fireRateTimer;
     private int currentIndex = 0;
 
-    // Redirect layer for external scripts
+    
     public float damage => currentWeapon != null ? currentWeapon.damage : 0f;
     public weaponAmmo Ammo => currentWeapon != null ? currentWeapon.Ammo : null;
     public Transform leftHandTarget => currentWeapon != null ? currentWeapon.leftHandTarget : null;
@@ -53,13 +53,11 @@ public class WeaponManager : MonoBehaviour
 
         currentWeapon = weapon;
 
-        // ==============================================================================
-        // FIX: Freeze physics while holding the weapon in hand!
-        // ==============================================================================
+       
         Rigidbody handRb = currentWeapon.GetComponent<Rigidbody>();
         if (handRb != null)
         {
-            handRb.isKinematic = true;  // Locks it to the hand (no gravity)
+            handRb.isKinematic = true;  
             handRb.useGravity = false;
         }
 
@@ -72,7 +70,7 @@ public class WeaponManager : MonoBehaviour
             weaponClass.SelectCurrentWeapon(this);
 
         TriggerAmmoUIUpdate();
-        Debug.Log($"[WeaponManager] Successfully Linked to: {currentWeapon.gameObject.name}");
+       
     }
 
     public void TriggerAmmoUIUpdate()
@@ -84,6 +82,13 @@ public class WeaponManager : MonoBehaviour
     bool ShouldFire()
     {
         if (currentWeapon == null) return false;
+
+        
+        if (currentWeapon.category == WeaponCategory.Throwable)
+        {
+            return Input.GetKeyDown(KeyCode.Mouse0);
+        }
+
         if (currentWeapon.weaponData == null) return false;
 
         fireRateTimer += Time.deltaTime;
@@ -171,7 +176,7 @@ public class WeaponManager : MonoBehaviour
 
     void HandleThrowable()
     {
-        // 1. Check if grenade is actually in hand using the bool
+        
         if (!IsGrenadeInHand())
         {
             Debug.LogWarning("[WeaponManager] Grenade is not in hand! Cancelling animation.");
@@ -184,14 +189,14 @@ public class WeaponManager : MonoBehaviour
             return;
         }
 
-        // 2. Play animation only if the bool condition passed
+        
         if (animator != null)
         {
             animator.SetTrigger("Toss");
         }
     }
 
-    // Called by Animation Event on the release frame
+    
     public void LaunchGrenade()
     {
         if (!IsGrenadeInHand()) return;
@@ -203,15 +208,15 @@ public class WeaponManager : MonoBehaviour
             ? currentWeapon.BarrelPos.position
             : camTrans.position + (camTrans.forward * 0.8f);
 
-        // 1. Spawn the clone
+        
         GameObject go = Instantiate(currentWeapon.throwablePrefab, spawnPos, camTrans.rotation);
 
-        // 2. GUARANTEE COLLIDER IS ON AND PHYSICAL
+       
         Collider grenadeCollider = go.GetComponent<Collider>();
         if (grenadeCollider != null)
         {
-            grenadeCollider.enabled = true;    // Forces the box collider ON
-            grenadeCollider.isTrigger = false; // Makes it solid so it hits the floor
+            grenadeCollider.enabled = true;    
+            grenadeCollider.isTrigger = false; 
 
             Collider playerCollider = GetComponentInParent<Collider>();
             if (playerCollider != null)
@@ -220,7 +225,7 @@ public class WeaponManager : MonoBehaviour
             }
         }
 
-        // 3. APPLY PHYSICS & THROW FORCE
+       
         Rigidbody rb = go.GetComponent<Rigidbody>();
         if (rb != null)
         {
@@ -235,27 +240,18 @@ public class WeaponManager : MonoBehaviour
             rb.AddForce(forceDir, ForceMode.Impulse);
         }
 
-        // =========================================================
-        // 4. START THE EXPLOSION COUNTDOWN!
-        // =========================================================
+       
         Grenade grenadeScript = go.GetComponent<Grenade>();
         if (grenadeScript != null)
         {
-            grenadeScript.isThrown = true; // This tells your Grenade.cs to start ticking!
+            grenadeScript.isThrown = true; 
         }
         else
         {
             Debug.LogWarning("Grenade script is missing on the throwable prefab!");
         }
 
-        // =========================================================
-        // 5. DESTROY GRENADE FROM INVENTORY AND UPDATE UI
-        // =========================================================
-
-        // Remove this line because it leaves a hidden ghost grenade in the array:
-        // currentWeapon.gameObject.SetActive(false); 
-
-        // Use your new WeaponSwap method instead!
+       
         if (weaponSwap != null)
         {
             weaponSwap.ConsumeCurrentThrowable();
